@@ -27,8 +27,8 @@ class Customer:
         return self._password
     
     @classmethod
-    def create(name: str, email: str, password: str):
+    def register_customer(cls, name: str, email: str, password: str):
         email_vo = Email.from_text(email)
         password_vo = Password(password)
-        return Customer(name, email_vo, password_vo)
+        return cls(name, email_vo, password_vo)
     
