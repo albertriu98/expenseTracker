@@ -22,6 +22,9 @@ Expense Tracker is designed to help users manage their personal finances by:
 
 The project emphasizes clean architecture through Domain Driven Design, separating domain logic from infrastructure concerns.
 
+Transactions are created by users. A transaction can be an expense or an income that the user wants to reflect. And is defined by an id, an amount abd currency, a user id and the date it was registered. Transactions are part of a user account, and are aggregated on monthly basis and categories.
+Transactions exist inside accounts, and accounts can be created, deleted or updated. An account is bounded to a user, but 1 user can have multiple accounts.
+
 ## Architecture
 
 This project follows **Domain Driven Design (DDD)** principles with clear separation of concerns:
