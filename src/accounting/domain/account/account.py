@@ -13,8 +13,8 @@ class Account:
         if self._currency != amount.currency :
             raise InvalidCurrency("Transaction currency does not match with Account currency")
         self._current_balance += amount.amount
-        TransactionCommitted()
-        return "Deposit correctly performed"
+        
+        return TransactionCommitted()
 
     def withdraw(self, amount : Money):
         if self._currentBalance < amount :
@@ -22,7 +22,7 @@ class Account:
         else if self._currency != amount.currency :
             raise InvalidCurrency("Transaction currency does not match with Account currency")
         self._currentBalance -= amount.amount
-        TransactionCommitted()
+        return TransactionCommitted()
 
     @classmethod
     def openAccount(cls, initAmount: Money)
