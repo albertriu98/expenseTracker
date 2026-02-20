@@ -9,16 +9,16 @@ from src.accounting.domain.value_objects.userId import UserId
 
 
 class Transaction:
-    def __init__(self, transactionType: TransactionType, user_id: UserId, money: Money,  description:  Description, tag: str = ""):
+    def __init__(self, transactionType: TransactionType, user_id: UserId, money: Money,  description:  str, categoryId: str = ""):
         """Do not call this method directly to create new Transactions"""
 
-        self._id = TransactionId.new()  # This will be set when the transaction is saved to the database
-        self._transactionType = transactionType
-        self._userId = user_id
-        self._money = money
-        self._description = description
-        self._tag = tag
-        self._dateCreated = datetime.now()
+        self._id = TransactionId.new()  # value object, immutable
+        self._transactionType = transactionType #value object, immutable
+        self._userId = user_id #value object, immutable
+        self._money = money #value object immutable
+        self._description = description #attribute
+        self._categoryId = categoryId #attribute
+        self._dateCreated = datetime.now() #timestamp
 
     def __str__(self):
         return f"Transaction(id={self.id}, transactionType='{self.transactionType}', amount={self.amount}, currency='{self.currency}', description='{self.description}', tag='{self.tag}')"
@@ -51,13 +51,13 @@ class Transaction:
         return self._description
     
     @property
-    def tag(self):
-        return self._tag
+    def categoryId(self):
+        return self._categoryId
     
     @property
     def dateCreated(self):
         return self._dateCreated
     
-    @classmethod
-    def create_transaction(cls, transaction_type: str , user_id: UUID, amount: Decimal, currency: str, description: str, tag: str = ""):
-        return cls(TransactionType(transaction_type), UserId(user_id), Money(amount, currency), Description(description), tag)
+    # @classmethod
+    # def create_transaction(cls, transaction_type: str , user_id: UUID, amount: Decimal, currency: str, description: str, tag: str = ""):
+    #     return cls(TransactionType(transaction_type), UserId(user_id), Money(amount, currency), Description(description), tag)
