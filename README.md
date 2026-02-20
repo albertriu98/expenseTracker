@@ -50,33 +50,40 @@ src/
 
 ```
 expenseTracker/
-├── src/
-│   ├── accounting/
-│   │   └── domain/
-│   │       ├── aggregates/
-│   │       │   └── account.py          # Account aggregate (WIP)
-│   │       ├── entities/
-│   │       │   ├── budget.py           # Budget entity (WIP)
-│   │       │   └── transaction.py      # Transaction entity
-│   │       └── value_objects/
-│   │           ├── description.py      # Transaction description
-│   │           ├── money.py            # Money value object with amount & currency
-│   │           ├── transactionId.py    # Unique transaction identifier
-│   │           ├── transactionType.py  # Income/Expense type
-│   │           └── userId.py           # User identifier reference
-│   └── identity/
-│       └── domain/
-│           ├── entities/
-│           │   └── customer.py         # Customer entity
-│           └── value_objects/
-│               ├── email.py            # Email with validation
-│               ├── password.py         # Password with validation
-│               └── userId.py           # Unique user identifier
-├── tests/
-│   └── accounting/
-│       └── test_all.py                 # Unit tests
+├── README.md
 ├── requirements.txt
-└── README.md
+├── src/
+│   ├── __init__.py
+│   ├── __pycache__/
+│   ├── accounting/
+│   │   ├── __init__.py
+│   │   ├── __pycache__/
+│   │   └── domain/
+│   │       ├── account/
+│   │       │   └── account.py
+│   │       ├── category/
+│   │       │   └── category.py
+│   │       └── transaction/
+│   │           ├── money.py
+│   │           ├── transaction.py
+│   │           ├── transactionId.py
+│   │           ├── transactionType.py
+│   │           └── userId.py
+│   ├── identity/
+│   ├── api/
+│   ├── application/
+│   ├── domain/
+│   │   ├── entities/
+│   │   │   └── customer.py
+│   │   └── value_objects/
+│   │       ├── email.py
+│   │       ├── password.py
+│   │       └── userId.py
+│   └── infrastructure/
+└── tests/
+   ├── accounting/
+   │   ├── test_all.py
+   │   └── __pycache__/
 ```
 
 ## Domain Model
