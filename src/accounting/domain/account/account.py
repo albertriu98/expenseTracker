@@ -1,31 +1,56 @@
-from src.accounting.domain.accountId import AccountId
+from src.accounting.domain.account.accountId import AccountId
 from src.accounting.domain.shared.domain_exceptions import InsufficientFundsException
-from src.accounting.domain.money import Money
-from src.accounting.domain.events import TransactionCommitted
+from src.accounting.domain.account.money import Money
+from src.accounting.domain.account.events import TransactionCommitted
+from src.accounting.domain.transaction.transaction import Transaction
 
 class Account:
     def __init__(self, initBalance: decimal, currency: str):
         self._accountId = AccountId.new()
         self._currency = currency
         self._currentBalance = initBalance
+        self._dateCreated = datetime.now() #timestamp
+        self._dateUpdated = datetime.now() #timestamp
+    
+    @property
+    def accountId(self):
+        return self._accountId
+    
+    @property
+    def currency(self):
+        return self._currency
+    
+    @property
+    def currentBalance(self):
+        return self._currentBalance
 
-    def deposit(self, amount: Money):
-        if self._currency != amount.currency :
+    @property
+    def dateCreated(self):
+        return self._dateCreated
+    
+    @property
+    def dateUpdated(self):
+        return self._dateUpdated
+
+    def deposit(self, transaction: Transaction):
+        if self._currency != transaction.currency :
             raise InvalidCurrency("Transaction currency does not match with Account currency")
-        self._current_balance += amount.amount
+        self._currentBalance += transaction.money.amount
         
-        return TransactionCommitted()
+        return TransactionCommitted(transaction_id=transaction.id, account_id=transaction.accountId, amount=transaction.amount,
+                currency=transaction.currency, transaction_type=transaction.transactionType,  category_id=transaction.categoryId)
 
-    def withdraw(self, amount : Money):
-        if self._currentBalance < amount :
+    def withdraw(self, transaction: Transaction):
+        if self._currentBalance < transaction.amount :
             raise InsufficientFundsException("Not enough balance to withdraw.")
-        else if self._currency != amount.currency :
+        elif self._currency != transaction.currency :
             raise InvalidCurrency("Transaction currency does not match with Account currency")
         self._currentBalance -= amount.amount
-        return TransactionCommitted()
+        return TransactionCommitted(transaction_id=transaction.id, account_id=transaction.accountId, amount=transaction.amount,
+                currency=transaction.currency, transaction_type=transaction.transactionType,  category_id=transaction.categoryId)
 
     @classmethod
     def openAccount(cls, initAmount: Money)
-        return cls(Account(initBalance=initAmount.amount, currency=initAmount.currency))
+        return cls(initBalance=initAmount.amount, currency=initAmount.currency)
 
     
