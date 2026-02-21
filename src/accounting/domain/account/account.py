@@ -39,12 +39,12 @@ class Account:
     def deposit(self, money: Money, description: str, categoryId: str):
         if self._currency != money.currency :
             raise InvalidCurrency("Transaction currency does not match with Account currency")
-        transaction = Transaction.create_transaction(transaction_type: "income" , 
-                                                    account_id: self._accountId, 
-                                                    amount: money.amount, 
-                                                    currency: money.currency, 
-                                                    description: descrption, 
-                                                    categoryId: categoryId)
+        transaction = Transaction.create_transaction(transaction_type="income" , 
+                                                    account_id=self._accountId, 
+                                                    amount=money.amount, 
+                                                    currency=money.currency, 
+                                                    description=descrption, 
+                                                    categoryId=categoryId)
         self._currentBalance += transaction.money.amount
         self._events.append(TransactionCommitted(transaction_id=transaction.id, 
                                                 account_id=transaction.accountId, 
@@ -59,11 +59,11 @@ class Account:
         elif self._currency != transaction.currency :
             raise InvalidCurrency("Transaction currency does not match with Account currency")
         transaction = Transaction.create_transaction(transaction_type: "expense" , 
-                                                    account_id: self._accountId, 
-                                                    amount: money.amount, 
-                                                    currency: money.currency, 
-                                                    description: description, 
-                                                    categoryId: categoryId)
+                                                    account_id=self._accountId, 
+                                                    amount=money.amount, 
+                                                    currency=money.currency, 
+                                                    description=description, 
+                                                    categoryId=categoryId)
         self._currentBalance -= money.amount
         self._events.append(TransactionCommitted(transaction_id=transaction.id, 
                                                 account_id=transaction.accountId, 
