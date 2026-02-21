@@ -43,7 +43,7 @@ class Account:
                                                     account_id=self._accountId, 
                                                     amount=money.amount, 
                                                     currency=money.currency, 
-                                                    description=descrption, 
+                                                    description=description, 
                                                     categoryId=categoryId)
         self._currentBalance += transaction.money.amount
         self._events.append(TransactionCommitted(transaction_id=transaction.id, 
