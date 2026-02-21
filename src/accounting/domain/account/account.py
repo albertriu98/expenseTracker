@@ -56,7 +56,7 @@ class Account:
     def withdraw(self, money: Money, description: str, categoryId: str):
         if self._currentBalance < money.amount :
             raise InsufficientFundsException("Not enough balance to withdraw.")
-        elif self._currency != transaction.currency :
+        elif self._currency != money.currency :
             raise InvalidCurrency("Transaction currency does not match with Account currency")
         transaction = Transaction.create_transaction(transaction_type: "expense" , 
                                                     account_id=self._accountId, 
