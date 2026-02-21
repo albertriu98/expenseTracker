@@ -73,7 +73,7 @@ class Account:
                                                 category_id=transaction.categoryId))
 
     @classmethod
-    def openAccount(cls, initAmount: Money)
+    def openAccount(cls, initAmount: Money):
         return cls(initBalance=initAmount.amount, currency=initAmount.currency)
 
     
