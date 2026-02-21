@@ -60,4 +60,4 @@ class Transaction:
     
     @classmethod
     def create_transaction(cls, transaction_type: str , account_id: UUID, amount: Decimal, currency: str, description: str, categoryId: str = ""):
-        return cls(TransactionType(transaction_type), UserId(user_id), Money(amount, currency), Description(description), tag)
+        return cls(TransactionType(transaction_type), UserId(user_id), Money(amount, currency), description, categoryId)

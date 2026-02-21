@@ -5,12 +5,13 @@ from src.accounting.domain.account.events import TransactionCommitted
 from src.accounting.domain.transaction.transaction import Transaction
 
 class Account:
-    def __init__(self, initBalance: decimal, currency: str):
+    def __init__(self, initMoney: Money):
         self._accountId = AccountId.new()
-        self._currency = currency
-        self._currentBalance = initBalance
+        self._currency = initMoney.currency
+        self._currentBalance = initMoney.amount
         self._dateCreated = datetime.now() #timestamp
         self._dateUpdated = datetime.now() #timestamp
+        self._events = []
     
     @property
     def accountId(self):
@@ -31,23 +32,45 @@ class Account:
     @property
     def dateUpdated(self):
         return self._dateUpdated
+    @property
+    def events(self):
+        return self._events
 
-    def deposit(self, transaction: Transaction):
-        if self._currency != transaction.currency :
+    def deposit(self, money: Money, description: str, categoryId: str):
+        if self._currency != money.currency :
             raise InvalidCurrency("Transaction currency does not match with Account currency")
+        transaction = Transaction.create_transaction(transaction_type: "income" , 
+                                                    account_id: self._accountId, 
+                                                    amount: money.amount, 
+                                                    currency: money.currency, 
+                                                    description: descrption, 
+                                                    categoryId: categoryId)
         self._currentBalance += transaction.money.amount
+        self._events.append(TransactionCommitted(transaction_id=transaction.id, 
+                                                account_id=transaction.accountId, 
+                                                amount=transaction.amount,
+                                                currency=transaction.currency, 
+                                                transaction_type=transaction.transactionType,  
+                                                category_id=transaction.categoryId))
         
-        return TransactionCommitted(transaction_id=transaction.id, account_id=transaction.accountId, amount=transaction.amount,
-                currency=transaction.currency, transaction_type=transaction.transactionType,  category_id=transaction.categoryId)
-
-    def withdraw(self, transaction: Transaction):
-        if self._currentBalance < transaction.amount :
+    def withdraw(self, money: Money, description: str, categoryId: str):
+        if self._currentBalance < money.amount :
             raise InsufficientFundsException("Not enough balance to withdraw.")
         elif self._currency != transaction.currency :
             raise InvalidCurrency("Transaction currency does not match with Account currency")
-        self._currentBalance -= amount.amount
-        return TransactionCommitted(transaction_id=transaction.id, account_id=transaction.accountId, amount=transaction.amount,
-                currency=transaction.currency, transaction_type=transaction.transactionType,  category_id=transaction.categoryId)
+        transaction = Transaction.create_transaction(transaction_type: "expense" , 
+                                                    account_id: self._accountId, 
+                                                    amount: money.amount, 
+                                                    currency: money.currency, 
+                                                    description: description, 
+                                                    categoryId: categoryId)
+        self._currentBalance -= money.amount
+        self._events.append(TransactionCommitted(transaction_id=transaction.id, 
+                                                account_id=transaction.accountId, 
+                                                amount=transaction.amount,
+                                                currency=transaction.currency, 
+                                                transaction_type=transaction.transactionType,  
+                                                category_id=transaction.categoryId))
 
     @classmethod
     def openAccount(cls, initAmount: Money)
