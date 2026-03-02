@@ -3,7 +3,6 @@ from src.accounting.domain.account.money import Money
 
 @dataclass(frozen=True)
 class TransactionCommitted:
-    transaction_id: str
     account_id: str
     amount: Decimal
     currency: str

@@ -1,5 +1,6 @@
 # Expense Tracker
-
+# Event storming
+![alt text](image.png)
 A Python-based expense tracking application built with **Domain Driven Design (DDD)** principles to manage personal finances through transactions and budgets.
 
 ## Table of Contents
