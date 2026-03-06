@@ -25,6 +25,11 @@ class Transaction:
 
     def __repr__(self):
         return self.__str__()
+
+    def __eq__(self, other):
+        if isinstance(other, Transaction):
+            return self.id == other.id
+        return False
     
     @property
     def id(self):
@@ -57,6 +62,12 @@ class Transaction:
     @property
     def dateCreated(self):
         return self._dateCreated
+
+    def updateDescription(self, newDescription: str):
+        self._description = newDescription
+    
+    def updateCategory(self, newCategoryId: str):
+        self._categoryId = newCategoryId
     
     @classmethod
     def create_transaction(cls, transaction_type: str , account_id: UUID, amount: Decimal, currency: str, description: str, categoryId: str = ""):

@@ -1,6 +1,7 @@
 # Expense Tracker
 # Event storming
 ![alt text](image.png)
+
 A Python-based expense tracking application built with **Domain Driven Design (DDD)** principles to manage personal finances through transactions and budgets.
 
 ## Table of Contents
@@ -20,6 +21,8 @@ Expense Tracker is designed to help users manage their personal finances by:
 - Recording income and expense transactions
 - Organizing transactions with tags and categories
 - Managing budgets for expense control
+
+![alt text](image-1.png)
 
 The project emphasizes clean architecture through Domain Driven Design, separating domain logic from infrastructure concerns.
 
