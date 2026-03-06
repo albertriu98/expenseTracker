@@ -5,10 +5,9 @@ from src.accounting.domain.account.events import TransactionCommitted
 from src.accounting.domain.transaction.transaction import Transaction
 
 class Account:
-    def __init__(self, initMoney: Money):
+    def __init__(self, initBalance: Money):
         self._accountId = AccountId.new()
-        self._currency = initMoney.currency
-        self._currentBalance = initMoney.amount
+        self._currentBalance = initBalance
         self._dateCreated = datetime.now() #timestamp
         self._dateUpdated = datetime.now() #timestamp
         self._events = []
@@ -18,12 +17,12 @@ class Account:
         return self._accountId
     
     @property
-    def currency(self):
-        return self._currency
+    def getCurrency(self):
+        return self._currentBalance.currency
     
     @property
-    def currentBalance(self):
-        return self._currentBalance
+    def getCurrentBalance(self):
+        return self._currentBalance.amount
 
     @property
     def dateCreated(self):
@@ -39,38 +38,25 @@ class Account:
         return events
 
     def deposit(self, money: Money, description: str, categoryId: str):
-        if self._currency != money.currency :
+        if self._currentBalance.currency != money.currency :
             raise InvalidCurrency("Transaction currency does not match with Account currency")
-        # transaction = Transaction.create_transaction(transaction_type="income" , 
-        #                                             account_id=self._accountId, 
-        #                                             amount=money.amount, 
-        #                                             currency=money.currency, 
-        #                                             description=description, 
-        #                                             categoryId=categoryId)
-        self._currentBalance += money.amount
+        self._currentBalance.amount += money.amount
         self._dateUpdated = datetime.now()
         self._events.append(TransactionCommitted(account_id=self.accountId, 
-                                                amount=money.amount,
-                                                currency=money.currency, 
+                                                money=money,
                                                 transaction_type="income",  
                                                 category_id=categoryId))
         
     def withdraw(self, money: Money, description: str, categoryId: str):
-        if self._currentBalance < money.amount :
+        if self._currentBalance.amount < money.amount :
             raise InsufficientFundsException("Not enough balance to withdraw.")
-        elif self._currency != money.currency :
+        elif self._currentBalance.currency != money.currency :
             raise InvalidCurrency("Transaction currency does not match with Account currency")
-        # transaction = Transaction.create_transaction(transaction_type="expense" , 
-        #                                             account_id=self._accountId, 
-        #                                             amount=money.amount, 
-        #                                             currency=money.currency, 
-        #                                             description=description, 
-        #                                             categoryId=categoryId)
-        self._currentBalance -= money.amount
+
+        self._currentBalance.amount -= money.amount
         self._dateUpdated = datetime.now()
         self._events.append(TransactionCommitted(account_id=self.accountId, 
-                                                amount=money.amount,
-                                                currency=money.currency, 
+                                                money=money,
                                                 transaction_type="expense",  
                                                 category_id=categoryId))
 
