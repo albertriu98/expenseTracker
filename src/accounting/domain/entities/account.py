@@ -3,8 +3,9 @@ from src.accounting.domain.domain_exceptions import InsufficientFundsException, 
 from src.accounting.domain.value_objects import Money
 from src.accounting.domain.events import TransactionCommitted
 from datetime import datetime
+from src.base import AggregateRoot
 
-class Account:
+class Account(AggregateRoot):
     def __init__(self, initBalance: Money):
         self._accountId = AccountId.new()
         self._currentBalance = initBalance
@@ -40,7 +41,7 @@ class Account:
     def deposit(self, money: Money, description: str, categoryId: str):
         if self._currentBalance.currency != money.currency :
             raise InvalidCurrencyException("Transaction currency does not match with Account currency")
-        self._currentBalance.amount += money.amount
+        self._currentBalance = self._currentBalance.add(money)
         self._dateUpdated = datetime.now()
         self._events.append(TransactionCommitted(account_id=self.accountId, 
                                                 money=money,
@@ -53,7 +54,7 @@ class Account:
             raise InsufficientFundsException("Not enough balance to withdraw.")
         elif self._currentBalance.currency != money.currency :
             raise InvalidCurrencyException("Transaction currency does not match with Account currency")
-        self._currentBalance.amount -= money.amount
+        self._currentBalance = self._currentBalance.subtract(money)
         self._dateUpdated = datetime.now()
         self._events.append(TransactionCommitted(account_id=self.accountId, 
                                                 money=money,

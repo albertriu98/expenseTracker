@@ -3,19 +3,17 @@ from uuid import UUID, uuid4
 from enum import Enum
 from decimal import Decimal
 from dataclasses import dataclass
+from src.base import EntityId
 
 
 @dataclass(frozen=True)
-class TransactionId:
-    _value: UUID
-
-    @staticmethod
-    def new():
-        return TransactionId(uuid4())
+class TransactionId(EntityId):
+    pass
     
-    @property
-    def value(self):
-        return self._value
+@dataclass(frozen=True)
+class AccountId(EntityId):
+    pass
+    
 
 @dataclass(frozen=True)
 class TransactionType(Enum):
@@ -44,14 +42,12 @@ class Money:
     def currency(self):
         return self._currency
 
-@dataclass(frozen=True)
-class AccountId:
-    _value: UUID
+    def add(self, other: "Money") -> "Money":
+        if self.currency != other.currency:
+            raise ValueError("Currency mismatch")
+        return Money(self.amount + other.amount, self.currency)
 
-    @staticmethod
-    def new():
-        return AccountId(uuid4())
-    
-    @property
-    def value(self):
-        return self._value
+    def subtract(self, other: "Money") -> "Money":
+        if self.currency != other.currency:
+            raise ValueError("Currency mismatch")
+        return Money(self.amount - other.amount, self.currency)

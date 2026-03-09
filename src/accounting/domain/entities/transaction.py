@@ -5,9 +5,9 @@ from src.accounting.domain.value_objects import TransactionId
 from src.accounting.domain.value_objects import TransactionType
 from src.accounting.domain.value_objects import Money
 from src.accounting.domain.value_objects import AccountId
+from src.base import AggregateRoot
 
-
-class Transaction:
+class Transaction(AggregateRoot):
     def __init__(self, transactionType: TransactionType, accountId: AccountId, money: Money,  description:  str, categoryId: str = ""):
         """Do not call this method directly to create new Transactions"""
 
