@@ -3,12 +3,12 @@ from uuid import UUID
 from decimal import Decimal
 from src.accounting.domain.value_objects import TransactionId
 from src.accounting.domain.value_objects import TransactionType
-from src.accounting.domain.value_objects import Money
+from src.accounting.domain.value_objects import MonetaryValue
 from src.accounting.domain.value_objects import AccountId
 from src.base import AggregateRoot
 
 class Transaction(AggregateRoot):
-    def __init__(self, transactionType: TransactionType, accountId: AccountId, money: Money,  description:  str, categoryId: str = ""):
+    def __init__(self, transactionType: TransactionType, accountId: AccountId, money: MonetaryValue,  description:  str, categoryId: str = ""):
         """Do not call this method directly to create new Transactions"""
 
         self._id = TransactionId.new()  # value object, immutable
@@ -77,4 +77,4 @@ class Transaction(AggregateRoot):
     
     @classmethod
     def create_transaction(cls, transaction_type: str , account_id: UUID, amount: Decimal, currency: str, description: str, categoryId: str):
-        return cls(TransactionType(transaction_type), AccountId(account_id), Money(amount, currency), description, categoryId, )
+        return cls(TransactionType(transaction_type), AccountId(account_id), MonetaryValue(amount, currency), description, categoryId, )

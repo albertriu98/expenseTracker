@@ -1,4 +1,3 @@
-
 from uuid import UUID, uuid4
 from enum import Enum
 from decimal import Decimal
@@ -21,7 +20,7 @@ class TransactionType(Enum):
     EXPENSE = "expense"
 
 @dataclass(frozen=True)
-class Money:
+class MonetaryValue:
     _amount: Decimal
     _currency: str
 
@@ -35,6 +34,11 @@ class Money:
         # Ensure uppercase
         object.__setattr__(self, "_currency", self._currency.upper())
     
+    def __eq__(self, value):
+        if not isinstance(value, MonetaryValue):
+            return NotImplemented
+        return self.amount == value.amount and self.currency == value.currency
+    
     @property
     def amount(self):
         return self._amount
@@ -42,12 +46,13 @@ class Money:
     def currency(self):
         return self._currency
 
-    def add(self, other: "Money") -> "Money":
-        if self.currency != other.currency:
+    #Side-effect free methods
+    def add(self, other: "MonetaryValue") -> "MonetaryValue":
+        if self._currency != other.currency:
             raise ValueError("Currency mismatch")
-        return Money(self.amount + other.amount, self.currency)
+        return MonetaryValue(self._amount + other.amount, self._currency)
 
-    def subtract(self, other: "Money") -> "Money":
+    def subtract(self, other: "MonetaryValue") -> "MonetaryValue":
         if self.currency != other.currency:
             raise ValueError("Currency mismatch")
-        return Money(self.amount - other.amount, self.currency)
+        return MonetaryValue(self._amount - other.amount, self._currency)

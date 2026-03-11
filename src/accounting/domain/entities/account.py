@@ -1,12 +1,12 @@
 from src.accounting.domain.value_objects import AccountId
 from src.accounting.domain.domain_exceptions import InsufficientFundsException, InvalidCurrencyException
-from src.accounting.domain.value_objects import Money
+from src.accounting.domain.value_objects import MonetaryValue
 from src.accounting.domain.events import TransactionCommitted
 from datetime import datetime
 from src.base import AggregateRoot
 
 class Account(AggregateRoot):
-    def __init__(self, initBalance: Money):
+    def __init__(self, initBalance: MonetaryValue):
         self._accountId = AccountId.new()
         self._currentBalance = initBalance
         self._dateCreated = datetime.now() #timestamp
@@ -38,10 +38,10 @@ class Account(AggregateRoot):
         self._events.clear()
         return events
 
-    def deposit(self, money: Money, description: str, categoryId: str):
+    def deposit(self, money: MonetaryValue, description: str, categoryId: str):
         if self._currentBalance.currency != money.currency :
             raise InvalidCurrencyException("Transaction currency does not match with Account currency")
-        self._currentBalance = self._currentBalance.add(money)
+        self._currentBalance = self._currentBalance.add(money) #Replace object
         self._dateUpdated = datetime.now()
         self._events.append(TransactionCommitted(account_id=self.accountId, 
                                                 money=money,
@@ -49,12 +49,12 @@ class Account(AggregateRoot):
                                                 description=description, 
                                                 category_id=categoryId))
         
-    def withdraw(self, money: Money, description: str, categoryId: str):
+    def withdraw(self, money: MonetaryValue, description: str, categoryId: str):
         if self._currentBalance.amount < money.amount :
             raise InsufficientFundsException("Not enough balance to withdraw.")
         elif self._currentBalance.currency != money.currency :
             raise InvalidCurrencyException("Transaction currency does not match with Account currency")
-        self._currentBalance = self._currentBalance.subtract(money)
+        self._currentBalance = self._currentBalance.subtract(money) #Replace object
         self._dateUpdated = datetime.now()
         self._events.append(TransactionCommitted(account_id=self.accountId, 
                                                 money=money,
