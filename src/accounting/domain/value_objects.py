@@ -28,7 +28,7 @@ class MonetaryValue:
         # Validate amount
         if self._amount < 0:
             raise ValueError("Amount cannot be negative")
-        # Validate currency code
+        # Validate currency code 
         if len(self._currency) != 3:
             raise ValueError("Currency code must be 3 letters")
         # Ensure uppercase
