@@ -5,7 +5,7 @@ from src.accounting.domain.value_objects import MonetaryValue, TransactionId
 @dataclass(frozen=True)
 class TransactionCommitted:
     account_id: str
-    money: Money
+    money: MonetaryValue
     description: str
     transaction_type: str
     category_id: str = None
@@ -25,6 +25,6 @@ class categoryUpdated:
 class TransferCommitted:
     from_account_id: str
     to_account_id: str
-    money: Money
+    money: MonetaryValue
     description: str
     category_id: str = None
