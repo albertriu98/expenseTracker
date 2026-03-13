@@ -1,5 +1,6 @@
 from dataclasses import dataclass
-from src.accounting.domain.value_objects import Money
+from src.accounting.domain.value_objects import MonetaryValue, TransactionId
+
 
 @dataclass(frozen=True)
 class TransactionCommitted:
@@ -12,10 +13,11 @@ class TransactionCommitted:
 @dataclass(frozen=True)
 class AccountCreated:
     account_id: str
-    initial_balance: Money
+    initial_balance: MonetaryValue
 
 @dataclass(frozen=True)
 class categoryUpdated:
+    transactionId: TransactionId
     category_id: str
     new_category_name: str
 

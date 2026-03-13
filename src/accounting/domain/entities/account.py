@@ -1,7 +1,7 @@
 from src.accounting.domain.value_objects import AccountId
 from src.accounting.domain.domain_exceptions import InsufficientFundsException, InvalidCurrencyException
 from src.accounting.domain.value_objects import MonetaryValue
-from src.accounting.domain.events import TransactionCommitted
+from src.accounting.domain.events import TransactionCommitted, AccountCreated
 from datetime import datetime
 from src.base import AggregateRoot
 
@@ -12,6 +12,10 @@ class Account(AggregateRoot):
         self._dateCreated = datetime.now() #timestamp
         self._dateUpdated = datetime.now() #timestamp
         self._events = []
+        self._events.append(AccountCreated(account_id=self.accountId, initial_balance=initBalance))
+    
+    def __str__(self):
+        return f"Account(id={self.accountId}, currentBalance={self.currentBalance}, currency='{self.currency}', dateCreated='{self.dateCreated}', dateUpdated='{self.dateUpdated}')"
     
     @property
     def accountId(self):

@@ -39,6 +39,9 @@ class MonetaryValue:
             return NotImplemented
         return self.amount == value.amount and self.currency == value.currency
     
+    def __str__(self):
+        return f"{self.amount} {self.currency}"
+    
     @property
     def amount(self):
         return self._amount
@@ -47,12 +50,12 @@ class MonetaryValue:
         return self._currency
 
     #Side-effect free methods
-    def add(self, other: "MonetaryValue") -> "MonetaryValue":
+    def add(self, other: MonetaryValue) -> MonetaryValue:
         if self._currency != other.currency:
             raise ValueError("Currency mismatch")
         return MonetaryValue(self._amount + other.amount, self._currency)
 
-    def subtract(self, other: "MonetaryValue") -> "MonetaryValue":
+    def subtract(self, other: MonetaryValue) -> MonetaryValue:
         if self.currency != other.currency:
             raise ValueError("Currency mismatch")
         return MonetaryValue(self._amount - other.amount, self._currency)

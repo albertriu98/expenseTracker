@@ -5,6 +5,7 @@ from src.accounting.domain.value_objects import TransactionId
 from src.accounting.domain.value_objects import TransactionType
 from src.accounting.domain.value_objects import MonetaryValue
 from src.accounting.domain.value_objects import AccountId
+from src.accounting.domain.events import categoryUpdated
 from src.base import AggregateRoot
 
 class Transaction(AggregateRoot):
@@ -18,6 +19,7 @@ class Transaction(AggregateRoot):
         self._description = description #attribute
         self._categoryId = categoryId #attribute
         self._dateCreated = datetime.now() #timestamp
+        self._events = []
 
     def __str__(self):
         return f"Transaction(id={self.id}, transactionType='{self.transactionType}', amount={self.amount}, currency='{self.currency}', description='{self.description}', tag='{self.tag}')"
@@ -67,6 +69,7 @@ class Transaction(AggregateRoot):
         if self.description is None:
             raise ValueError("Description cannot be None")
         self._description = newDescription
+        self._events.append(categoryUpdated(category_id=self.categoryId, new_category_name=newDescription, transactionId=self.id))
 
     @categoryId.setter
     def categoryId(self, newCategoryId: str):
