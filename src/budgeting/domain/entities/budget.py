@@ -1,12 +1,13 @@
+from src.budgeting.domain.value_objects import BudgetId, MonetaryValue
+
 class Budget:
-    def __init__(self, accountId: accountId, name: str, moneyLImit: Money, timeRange: timeRange, categoryId: categoryId):
+    def __init__(self, accountId: accountId, name: str, moneyLImit: MonetaryValue, timeRange: timeRange, currency: str):
         self._id = BudgetId.new()
         self._accountId = accountId
         self._name = name
         self._moneyLimit = moneyLImit
-        self._actualMoney = 0
+        self._actualMoney = (0, currency)
         self._timeRange = timeRange
-        self._categoryId = categoryId
     
     @property
     def id(self):
@@ -34,13 +35,8 @@ class Budget:
     
     @property
     def timeRange(self):
-        return self._categoryId
+        return self.timeRange
     
     def accountTransaction(self):
         # Receive transaction (context mapping) and account it to actualMoney
         pass
-
-
-    @classmethod
-    def createBudget(cls, accountId, name, moneyLImit, timeRange, categoryId):
-        return cls(accountId, name, moneyLImit, timeRange, categoryId)

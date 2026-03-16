@@ -1,7 +1,8 @@
 from dataclasses import dataclass
 import uuid
+import abc
 
-class Entity:
+class Entity(abc):
     pass
 
 class AggregateRoot(Entity):

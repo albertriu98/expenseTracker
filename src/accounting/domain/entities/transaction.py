@@ -69,15 +69,16 @@ class Transaction(AggregateRoot):
         if self.description is None:
             raise ValueError("Description cannot be None")
         self._description = newDescription
-        self._events.append(categoryUpdated(category_id=self.categoryId, new_category_name=newDescription, transactionId=self.id))
+        
 
     @categoryId.setter
     def categoryId(self, newCategoryId: str):
         if self.categoryId is None:
             raise ValueError("Category ID cannot be None")
         self._categoryId = newCategoryId
+        self._events.append(categoryUpdated(category_id=self.categoryId, new_category_name=newCategoryId, transactionId=self.id))
 
     
-    @classmethod
-    def create_transaction(cls, transaction_type: str , account_id: UUID, amount: Decimal, currency: str, description: str, categoryId: str):
-        return cls(TransactionType(transaction_type), AccountId(account_id), MonetaryValue(amount, currency), description, categoryId, )
+    # @classmethod
+    # def create_transaction(cls, transaction_type: str , account_id: UUID, amount: Decimal, currency: str, description: str, categoryId: str):
+    #     return cls(TransactionType(transaction_type), AccountId(account_id), MonetaryValue(amount, currency), description, categoryId, )
