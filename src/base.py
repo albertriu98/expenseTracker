@@ -1,8 +1,9 @@
 from dataclasses import dataclass
 import uuid
-import abc
+from abc import ABC
+from datetime import datetime
 
-class Entity(abc):
+class Entity(ABC):
     pass
 
 class AggregateRoot(Entity):
@@ -19,3 +20,7 @@ class EntityId:
     @property
     def value(self):
         return self._value
+
+@dataclass(frozen=True)
+class Event(ABC):
+    datetime = datetime.now()

@@ -1,6 +1,5 @@
-from src.accounting.domain.value_objects import AccountId
+from src.accounting.domain.value_objects import AccountId, MonetaryValue
 from src.accounting.domain.domain_exceptions import InsufficientFundsException, InvalidCurrencyException
-from src.accounting.domain.value_objects import MonetaryValue
 from src.accounting.domain.events import TransactionCommitted, AccountCreated
 from datetime import datetime
 from src.base import AggregateRoot

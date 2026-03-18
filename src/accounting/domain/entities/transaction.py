@@ -1,10 +1,7 @@
 from datetime import datetime
 from uuid import UUID
 from decimal import Decimal
-from src.accounting.domain.value_objects import TransactionId
-from src.accounting.domain.value_objects import TransactionType
-from src.accounting.domain.value_objects import MonetaryValue
-from src.accounting.domain.value_objects import AccountId
+from src.accounting.domain.value_objects import TransactionId, TransactionType, MonetaryValue, AccountId
 from src.accounting.domain.events import categoryUpdated
 from src.base import AggregateRoot
 
