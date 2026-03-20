@@ -85,6 +85,19 @@ def test_account_deposit_creates_transaction_event_and_updates_balance():
     assert events[0].money == MonetaryValue(Decimal("50.00"), "USD")
 
 
+def test_account_event_store_contains_transaction_committed_after_deposit():
+    account = Account(MonetaryValue(Decimal("100.00"), "USD"))
+    account.pull_events()  # clear initial AccountCreated event
+
+    account.deposit(MonetaryValue(Decimal("25.00"), "USD"), "Side gig", "income")
+
+    events = account.pull_events()
+    assert any(isinstance(evt, TransactionCommitted) for evt in events)
+    committed = [evt for evt in events if isinstance(evt, TransactionCommitted)]
+    assert len(committed) == 1
+    assert committed[0].money == MonetaryValue(Decimal("25.00"), "USD")
+
+
 def test_account_withdraw_creates_transaction_event_and_updates_balance():
     account = Account(MonetaryValue(Decimal("100.00"), "USD"))
     account.pull_events()  # clear initial event
