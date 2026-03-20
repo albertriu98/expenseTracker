@@ -13,13 +13,9 @@ class AggregateRoot(Entity):
 class EntityId:
     value: uuid.UUID
 
-    @staticmethod
-    def new():
-        return EntityId(uuid.uuid4())
-    
-    @property
-    def value(self):
-        return self._value
+    @classmethod
+    def new(cls):
+        return cls(uuid.uuid4())
 
 @dataclass(frozen=True)
 class Event(ABC):
