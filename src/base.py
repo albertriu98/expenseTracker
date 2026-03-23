@@ -20,3 +20,11 @@ class EntityId:
 @dataclass(frozen=True)
 class Event(ABC):
     datetime = datetime.now()
+
+    def to_dict(self) -> dict:
+        """Serialize event to dictionary."""
+
+
+    @classmethod
+    def from_dict(cls, data: dict):
+        """Deserialize event from dictionary."""

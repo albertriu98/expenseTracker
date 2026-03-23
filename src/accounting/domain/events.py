@@ -2,8 +2,6 @@ from dataclasses import dataclass
 from src.accounting.domain.value_objects import MonetaryValue, TransactionId
 from src.base import Event
 
-
-
 @dataclass(frozen=True)
 class TransactionCommitted(Event):
     account_id: str
