@@ -20,11 +20,21 @@ class EntityId:
 @dataclass(frozen=True)
 class Event(ABC):
     datetime = datetime.now()
+    version: int
+    typeName: str
 
     def to_dict(self) -> dict:
         """Serialize event to dictionary."""
+        data = {}
+        for key, value in self.__dict__.items():
+            if isinstance(value, datetime):
+                data[key] = value.isoformat()
+            else:
+                data[key] = value
+        return data
 
 
     @classmethod
     def from_dict(cls, data: dict):
         """Deserialize event from dictionary."""
+        

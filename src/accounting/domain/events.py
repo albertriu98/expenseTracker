@@ -4,6 +4,7 @@ from src.base import Event
 
 @dataclass(frozen=True)
 class TransactionCommitted(Event):
+    typeName = "TransactionCommitted"
     account_id: str
     money: MonetaryValue
     description: str
@@ -12,17 +13,20 @@ class TransactionCommitted(Event):
 
 @dataclass(frozen=True)
 class AccountCreated(Event):
+    typeName = "AccountCreated"
     account_id: str
     initial_balance: MonetaryValue
 
 @dataclass(frozen=True)
 class categoryUpdated(Event):
+    typeName = "CategoryUpdated"
     transactionId: TransactionId
     category_id: str
     new_category_name: str
 
 @dataclass(frozen=True)
 class TransferCommitted(Event):
+    typeName = "TransferCommitted"
     from_account_id: str
     to_account_id: str
     money: MonetaryValue
