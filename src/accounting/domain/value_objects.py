@@ -3,6 +3,7 @@ from enum import Enum
 from decimal import Decimal
 from dataclasses import dataclass
 from src.base import EntityId
+from src.accounting.domain.domain_exceptions import InvalidCurrencyException, InsufficientFundsException
 
 
 @dataclass(frozen=True)
@@ -51,11 +52,15 @@ class MonetaryValue:
 
     #Side-effect free methods
     def add(self, other: MonetaryValue) -> MonetaryValue:
+        """Add two MonetaryValue objects, returning a new MonetaryValue. Currencies must match."""
         if self._currency != other.currency:
-            raise ValueError("Currency mismatch")
+            raise InvalidCurrencyException("Currency mismatch")
         return MonetaryValue(self._amount + other.amount, self._currency)
 
     def subtract(self, other: MonetaryValue) -> MonetaryValue:
+        """Subtract one MonetaryValue from another, returning a new MonetaryValue. Currencies must match."""
         if self.currency != other.currency:
-            raise ValueError("Currency mismatch")
+            raise InvalidCurrencyException("Currency mismatch")
+        if self._amount < other.amount:
+            raise InsufficientFundsException("Insufficient funds for this operation")
         return MonetaryValue(self._amount - other.amount, self._currency)

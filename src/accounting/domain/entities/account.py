@@ -42,8 +42,6 @@ class Account(AggregateRoot):
         return events
 
     def deposit(self, money: MonetaryValue, description: str, categoryId: str):
-        if self._currentBalance.currency != money.currency :
-            raise InvalidCurrencyException("Transaction currency does not match with Account currency")
         self._currentBalance = self._currentBalance.add(money) #Replace object
         self._dateUpdated = datetime.now()
         self._events.append(TransactionCommitted(account_id=self.accountId, 
@@ -53,10 +51,6 @@ class Account(AggregateRoot):
                                                 category_id=categoryId))
         
     def withdraw(self, money: MonetaryValue, description: str, categoryId: str):
-        if self._currentBalance.amount < money.amount :
-            raise InsufficientFundsException("Not enough balance to withdraw.")
-        elif self._currentBalance.currency != money.currency :
-            raise InvalidCurrencyException("Transaction currency does not match with Account currency")
         self._currentBalance = self._currentBalance.subtract(money) #Replace object
         self._dateUpdated = datetime.now()
         self._events.append(TransactionCommitted(account_id=self.accountId, 
