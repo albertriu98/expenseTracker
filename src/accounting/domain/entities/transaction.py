@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from uuid import UUID
 from decimal import Decimal
 from src.accounting.domain.value_objects import TransactionId, TransactionType, MonetaryValue, AccountId
@@ -9,13 +9,14 @@ class Transaction(AggregateRoot):
     def __init__(self, transactionType: TransactionType, accountId: AccountId, money: MonetaryValue,  description:  str, categoryId: str = ""):
         """Do not call this method directly to create new Transactions"""
 
+        super().__init__()
         self._id = TransactionId.new()  # value object, immutable
         self._transactionType = transactionType #value object, immutable
         self.accountId = accountId #value object, immutable
         self._money = money #value object immutable
         self._description = description #attribute
         self._categoryId = categoryId #attribute
-        self._dateCreated = datetime.now() #timestamp
+        self._dateCreated = datetime.now(timezone.utc) #timestamp
         self._events = []
 
     def __str__(self):

@@ -7,7 +7,18 @@ class Entity(ABC):
     pass
 
 class AggregateRoot(Entity):
-    pass
+    _events: list[Event]
+
+    def __init__(self):
+        self._events = []
+
+    def pull_events(self):
+        events = self._events[:]
+        self._events.clear()
+        return events
+    
+    def add_event(self, event: Event):
+        self._events.append(event)
 
 @dataclass(frozen=True)
 class EntityId:

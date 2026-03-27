@@ -24,11 +24,11 @@ class categoryUpdated(Event):
     category_id: str
     new_category_name: str
 
-@dataclass(frozen=True)
-class TransferCommitted(Event):
-    typeName = "TransferCommitted"
-    from_account_id: str
-    to_account_id: str
-    money: MonetaryValue
-    description: str
-    category_id: str = None
+# @dataclass(frozen=True)
+# class TransferCommitted(Event):
+#     typeName = "TransferCommitted"
+#     from_account_id: str
+#     to_account_id: str
+#     money: MonetaryValue
+#     description: str
+#     category_id: str = None

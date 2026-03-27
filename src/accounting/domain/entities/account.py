@@ -1,17 +1,23 @@
 from src.accounting.domain.value_objects import AccountId, MonetaryValue
 from src.accounting.domain.domain_exceptions import InsufficientFundsException, InvalidCurrencyException
 from src.accounting.domain.events import TransactionCommitted, AccountCreated
-from datetime import datetime
+from datetime import datetime, timezone
 from src.base import AggregateRoot
 
 class Account(AggregateRoot):
+    _accountId: AccountId
+    _currentBalance: MonetaryValue
+    _dateCreated: datetime
+    _dateUpdated: datetime
+    
     def __init__(self, initBalance: MonetaryValue):
+        super().__init__()
         self._accountId = AccountId.new()
         self._currentBalance = initBalance
-        self._dateCreated = datetime.now() #timestamp
-        self._dateUpdated = datetime.now() #timestamp
-        self._events = []
-        self._events.append(AccountCreated(account_id=self.accountId, initial_balance=initBalance))
+        now = datetime.now(timezone.utc)
+        self._dateCreated = now #timestamp
+        self._dateUpdated = now #timestamp
+        self.add_event(AccountCreated(account_id=self.accountId, initial_balance=initBalance))
     
     def __str__(self):
         return f"Account(id={self.accountId}, currentBalance={self.currentBalance}, currency='{self.currency}', dateCreated='{self.dateCreated}', dateUpdated='{self.dateUpdated}')"
@@ -36,15 +42,10 @@ class Account(AggregateRoot):
     def dateUpdated(self):
         return self._dateUpdated
 
-    def pull_events(self):
-        events = self._events[:]
-        self._events.clear()
-        return events
-
     def deposit(self, money: MonetaryValue, description: str, categoryId: str):
         self._currentBalance = self._currentBalance.add(money) #Replace object
         self._dateUpdated = datetime.now()
-        self._events.append(TransactionCommitted(account_id=self.accountId, 
+        self.add_event(TransactionCommitted(account_id=self._accountId, 
                                                 money=money,
                                                 transaction_type="income", 
                                                 description=description, 
@@ -53,7 +54,7 @@ class Account(AggregateRoot):
     def withdraw(self, money: MonetaryValue, description: str, categoryId: str):
         self._currentBalance = self._currentBalance.subtract(money) #Replace object
         self._dateUpdated = datetime.now()
-        self._events.append(TransactionCommitted(account_id=self.accountId, 
+        self.add_event(TransactionCommitted(account_id=self._accountId, 
                                                 money=money,
                                                 transaction_type="expense",  
                                                 description=description,
