@@ -1,7 +1,10 @@
 from src.budgeting.domain.value_objects import BudgetId, MonetaryValue
+from src.budgeting.domain.value_objects import AccountId
+from src.base import AggregateRoot
 
-class Budget:
-    def __init__(self, accountId: accountId, name: str, moneyLImit: MonetaryValue, timeRange: timeRange, currency: str):
+class Budget(AggregateRoot):
+    def __init__(self, accountId: AccountId, name: str, moneyLImit: MonetaryValue, timeRange: timeRange, currency: str):
+        super().__init__()
         self._id = BudgetId.new()
         self._accountId = accountId
         self._name = name
@@ -37,6 +40,3 @@ class Budget:
     def timeRange(self):
         return self.timeRange
     
-    def accountTransaction(self):
-        # Receive transaction (context mapping) and account it to actualMoney
-        pass
