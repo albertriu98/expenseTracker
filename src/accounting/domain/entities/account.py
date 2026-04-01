@@ -45,6 +45,7 @@ class Account(AggregateRoot):
     def deposit(self, money: MonetaryValue, description: str, categoryId: str):
         self._currentBalance = self._currentBalance.add(money) #Replace object
         self._dateUpdated = datetime.now()
+        self._version += 1
         self.add_event(TransactionCommitted(account_id=self._accountId, 
                                                 money=money,
                                                 transaction_type="income", 
@@ -54,6 +55,7 @@ class Account(AggregateRoot):
     def withdraw(self, money: MonetaryValue, description: str, categoryId: str):
         self._currentBalance = self._currentBalance.subtract(money) #Replace object
         self._dateUpdated = datetime.now()
+        self._version += 1
         self.add_event(TransactionCommitted(account_id=self._accountId, 
                                                 money=money,
                                                 transaction_type="expense",  

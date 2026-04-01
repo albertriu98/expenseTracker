@@ -16,8 +16,11 @@ class Transaction(AggregateRoot):
         self._money = money #value object immutable
         self._description = description #attribute
         self._categoryId = categoryId #attribute
-        self._dateCreated = datetime.now(timezone.utc) #timestamp
+        now = datetime.now(timezone.utc)
+        self._dateCreated = now
+        self._dateUpdated = now
         self._events = []
+        self.add_event(categoryUpdated(category_id=self.categoryId, new_category_name=categoryId, transactionId=self.id))
 
     def __str__(self):
         return f"Transaction(id={self.id}, transactionType='{self.transactionType}', amount={self.amount}, currency='{self.currency}', description='{self.description}', tag='{self.tag}')"
@@ -67,6 +70,8 @@ class Transaction(AggregateRoot):
         if self.description is None:
             raise ValueError("Description cannot be None")
         self._description = newDescription
+        self._version += 1
+        self._dateUpdated = datetime.now(timezone.utc)
         
 
     @categoryId.setter
@@ -74,6 +79,8 @@ class Transaction(AggregateRoot):
         if self.categoryId is None:
             raise ValueError("Category ID cannot be None")
         self._categoryId = newCategoryId
+        self._version += 1
+        self._dateUpdated = datetime.now(timezone.utc)
         self._events.append(categoryUpdated(category_id=self.categoryId, new_category_name=newCategoryId, transactionId=self.id))
 
     

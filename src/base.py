@@ -4,19 +4,18 @@ from abc import ABC
 from datetime import datetime
 
 class Entity(ABC):
-    version: int
-
-    def __init__(self):
-        self.version = 0
+    pass
 
 
 class AggregateRoot(Entity):
     super().__init__()
 
     _events: list[Event]
+    _version: int
 
     def __init__(self):
         self._events = []
+        self._version = 0
 
     def pull_events(self):
         events = self._events[:]
