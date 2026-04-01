@@ -81,7 +81,9 @@ class Transaction(AggregateRoot):
         self._categoryId = newCategoryId
         self._version += 1
         self._dateUpdated = datetime.now(timezone.utc)
-        self._events.append(categoryUpdated(category_id=self.categoryId, new_category_name=newCategoryId, transactionId=self.id))
+        self._events.append(categoryUpdated(category_id=self.categoryId, 
+                                            new_category_name=newCategoryId, 
+                                            transactionId=self.id))
 
     
     # @classmethod
