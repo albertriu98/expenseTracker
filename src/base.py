@@ -30,7 +30,7 @@ class EntityId:
     value: uuid.UUID
 
     @classmethod
-    def new(cls):
+    def nextId(cls):
         return cls(uuid.uuid4())
 
 @dataclass(frozen=True)

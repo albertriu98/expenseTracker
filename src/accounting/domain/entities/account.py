@@ -12,7 +12,7 @@ class Account(AggregateRoot):
     
     def __init__(self, initBalance: MonetaryValue):
         super().__init__()
-        self._accountId = AccountId.new()
+        self._accountId = AccountId.nextId()
         self._currentBalance = initBalance
         now = datetime.now(timezone.utc)
         self._dateCreated = now #timestamp

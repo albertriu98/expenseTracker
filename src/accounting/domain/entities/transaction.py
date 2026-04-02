@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 from uuid import UUID
 from decimal import Decimal
 from src.accounting.domain.value_objects import TransactionId, TransactionType, MonetaryValue, AccountId
-from src.accounting.domain.events import categoryUpdated
+from src.accounting.domain.events import TransactionCategoryUpdated, TransactionDescriptionUpdated
 from src.base import AggregateRoot
 
 class Transaction(AggregateRoot):
@@ -10,7 +10,7 @@ class Transaction(AggregateRoot):
         """Do not call this method directly to create new Transactions"""
 
         super().__init__()
-        self._id = TransactionId.new()  # value object, immutable
+        self._id = TransactionId.nextId()  # value object, immutable
         self._transactionType = transactionType #value object, immutable
         self.accountId = accountId #value object, immutable
         self._money = money #value object immutable
@@ -19,8 +19,9 @@ class Transaction(AggregateRoot):
         now = datetime.now(timezone.utc)
         self._dateCreated = now
         self._dateUpdated = now
+        self._version = 0
         self._events = []
-        self.add_event(categoryUpdated(category_id=self.categoryId, new_category_name=categoryId, transactionId=self.id))
+
 
     def __str__(self):
         return f"Transaction(id={self.id}, transactionType='{self.transactionType}', amount={self.amount}, currency='{self.currency}', description='{self.description}', tag='{self.tag}')"
@@ -72,7 +73,10 @@ class Transaction(AggregateRoot):
         self._description = newDescription
         self._version += 1
         self._dateUpdated = datetime.now(timezone.utc)
-        
+        self._events.append(TransactionDescriptionUpdated(category_id=self.categoryId, 
+                                                          new_description=newDescription, 
+                                                          transactionId=self.id, 
+                                                          version=self._version))
 
     @categoryId.setter
     def categoryId(self, newCategoryId: str):
@@ -81,9 +85,10 @@ class Transaction(AggregateRoot):
         self._categoryId = newCategoryId
         self._version += 1
         self._dateUpdated = datetime.now(timezone.utc)
-        self._events.append(categoryUpdated(category_id=self.categoryId, 
+        self._events.append(TransactionCategoryUpdated(category_id=self.categoryId, 
                                             new_category_name=newCategoryId, 
-                                            transactionId=self.id))
+                                            transactionId=self.id, 
+                                            version=self._version))
 
     
     # @classmethod
