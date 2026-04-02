@@ -17,6 +17,7 @@ class AccountCreated(Event):
     typeName = "AccountCreated"
     account_id: str
     initial_balance: MonetaryValue
+    version: int = 0
 
 @dataclass(frozen=True)
 class TransactionCategoryUpdated(Event):
