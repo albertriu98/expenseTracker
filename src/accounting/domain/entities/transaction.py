@@ -91,6 +91,6 @@ class Transaction(AggregateRoot):
                                             version=self._version))
 
     
-    # @classmethod
-    # def create_transaction(cls, transaction_type: str , account_id: UUID, amount: Decimal, currency: str, description: str, categoryId: str):
-    #     return cls(TransactionType(transaction_type), AccountId(account_id), MonetaryValue(amount, currency), description, categoryId, )
+    @classmethod
+    def create_transaction(cls, transaction_type: str , account_id: UUID, amount: Decimal, currency: str, description: str, categoryId: str):
+       return cls(TransactionType(transaction_type), AccountId(account_id), MonetaryValue(amount, currency), description, categoryId, )

@@ -2,6 +2,7 @@ from src.accounting.domain.value_objects import AccountId, MonetaryValue
 from src.accounting.domain.events import TransactionCommitted, AccountCreated
 from datetime import datetime, timezone
 from src.base import AggregateRoot
+from decimal import Decimal
 
 class Account(AggregateRoot):
     _accountId: AccountId
@@ -63,4 +64,6 @@ class Account(AggregateRoot):
                                                 category_id=categoryId))
 
 
-    
+    @classmethod
+    def create_account(cls, amount: Decimal, currency: str):
+        return cls(MonetaryValue(amount, currency))
