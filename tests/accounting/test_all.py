@@ -40,10 +40,10 @@ def test_monetary_value_add_subtract_same_currency():
 def test_monetary_value_add_subtract_mismatched_currency_raises():
     mv = MonetaryValue(Decimal("100.00"), "USD")
 
-    with pytest.raises(ValueError):
+    with pytest.raises(InvalidCurrencyException):
         mv.add(MonetaryValue(Decimal("10.00"), "EUR"))
 
-    with pytest.raises(ValueError):
+    with pytest.raises(InvalidCurrencyException):
         mv.subtract(MonetaryValue(Decimal("10.00"), "EUR"))
 
 
@@ -84,6 +84,7 @@ def test_account_deposit_creates_transaction_event_and_updates_balance():
     assert isinstance(events[0], TransactionCommitted)
     assert events[0].transaction_type == "income"
     assert events[0].money == MonetaryValue(Decimal("50.00"), "USD")
+    assert events[0].version == 1  # Should be the aggregate version after deposit
 
 
 def test_account_event_store_contains_transaction_committed_after_deposit():
@@ -131,7 +132,7 @@ def test_account_invalid_currency_transaction_raises():
 
 
 def test_transaction_entity_basic_behaviour_and_category_update_event():
-    account_id = AccountId.new()
+    account_id = AccountId.nextId()
     txn = Transaction(TransactionType.INCOME, account_id, MonetaryValue(Decimal("25.00"), "USD"), "Bonus", "salary")
 
     assert txn.transactionType == TransactionType.INCOME
@@ -172,7 +173,7 @@ def test_account_id_creation():
 # Tests for Events
 def test_account_created_event():
     mv = MonetaryValue(Decimal("100.00"), "USD")
-    event = AccountCreated(account_id="test_id", initial_balance=mv)
+    event = AccountCreated(account_id="test_id", initial_balance=mv, version=0)
     assert event.typeName == "AccountCreated"
     assert event.account_id == "test_id"
     assert event.initial_balance == mv
@@ -181,7 +182,7 @@ def test_account_created_event():
 
 def test_transaction_committed_event():
     mv = MonetaryValue(Decimal("50.00"), "USD")
-    event = TransactionCommitted(account_id="acc_id", money=mv, description="test", transaction_type="income", category_id="salary")
+    event = TransactionCommitted(account_id="acc_id", money=mv, description="test", transaction_type="income", category_id="salary", version=0)
     assert event.typeName == "TransactionCommitted"
     assert event.account_id == "acc_id"
     assert event.money == mv
@@ -193,27 +194,27 @@ def test_transaction_committed_event():
 
 def test_transaction_category_updated_event():
     txn_id = TransactionId.nextId()
-    event = TransactionCategoryUpdated(transactionId=txn_id, category_id="old_cat", new_category_name="new_cat", version=1)
+    event = TransactionCategoryUpdated(transactionId=txn_id, category_id="old_cat", new_category_name="new_cat", version=0)
     assert event.typeName == "TransactionCategoryUpdated"
     assert event.transactionId == txn_id
     assert event.category_id == "old_cat"
     assert event.new_category_name == "new_cat"
-    assert event.version == 1
+    assert event.version == 0
 
 
 def test_transaction_description_updated_event():
     txn_id = TransactionId.nextId()
-    event = TransactionDescriptionUpdated(transactionId=txn_id, category_id="cat", new_description="new desc", version=1)
+    event = TransactionDescriptionUpdated(transactionId=txn_id, category_id="cat", new_description="new desc", version=0)
     assert event.typeName == "TransactionDescriptionUpdated"
     assert event.transactionId == txn_id
     assert event.category_id == "cat"
     assert event.new_description == "new desc"
-    assert event.version == 1
+    assert event.version == 0
 
 
 def test_event_to_dict():
     mv = MonetaryValue(Decimal("100.00"), "USD")
-    event = AccountCreated(account_id="test_id", initial_balance=mv)
+    event = AccountCreated(account_id="test_id", initial_balance=mv, version=0)
     data = event.to_dict()
     assert "account_id" in data
     assert "initial_balance" in data
@@ -266,7 +267,7 @@ def test_transaction_create_transaction_classmethod():
 
 
 def test_transaction_description_setter():
-    acc_id = AccountId.new()
+    acc_id = AccountId.nextId()
     txn = Transaction(TransactionType.EXPENSE, acc_id, MonetaryValue(Decimal("10.00"), "USD"), "Old desc", "misc")
     txn.description = "New desc"
     assert txn.description == "New desc"
@@ -276,7 +277,7 @@ def test_transaction_description_setter():
 
 
 def test_transaction_category_id_setter():
-    acc_id = AccountId.new()
+    acc_id = AccountId.nextId()
     txn = Transaction(TransactionType.EXPENSE, acc_id, MonetaryValue(Decimal("10.00"), "USD"), "Test", "old_cat")
     txn.categoryId = "new_cat"
     assert txn.categoryId == "new_cat"
@@ -286,7 +287,7 @@ def test_transaction_category_id_setter():
 
 
 def test_transaction_equality():
-    acc_id = AccountId.new()
+    acc_id = AccountId.nextId()
     mv = MonetaryValue(Decimal("10.00"), "USD")
     txn1 = Transaction(TransactionType.INCOME, acc_id, mv, "Test", "misc")
     txn2 = Transaction(TransactionType.INCOME, acc_id, mv, "Test", "misc")
@@ -299,7 +300,7 @@ def test_transaction_equality():
 
 
 def test_transaction_str_representation():
-    acc_id = AccountId.new()
+    acc_id = AccountId.nextId()
     txn = Transaction(TransactionType.INCOME, acc_id, MonetaryValue(Decimal("25.00"), "USD"), "Bonus", "salary")
     str_repr = str(txn)
     assert "Transaction" in str_repr
@@ -309,7 +310,7 @@ def test_transaction_str_representation():
 
 
 def test_transaction_properties():
-    acc_id = AccountId.new()
+    acc_id = AccountId.nextId()
     mv = MonetaryValue(Decimal("30.00"), "EUR")
     txn = Transaction(TransactionType.EXPENSE, acc_id, mv, "Groceries", "food")
     

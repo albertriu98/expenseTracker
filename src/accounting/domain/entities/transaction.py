@@ -24,7 +24,7 @@ class Transaction(AggregateRoot):
 
 
     def __str__(self):
-        return f"Transaction(id={self.id}, transactionType='{self.transactionType}', amount={self.amount}, currency='{self.currency}', description='{self.description}', tag='{self.tag}')"
+        return f"Transaction(id={self.id}, transactionType='{self.transactionType.value}', amount={self.amount}, currency='{self.currency}', description='{self.description}', categoryId='{self.categoryId}')"
 
     def __repr__(self):
         return self.__str__()
@@ -42,10 +42,6 @@ class Transaction(AggregateRoot):
     def transactionType(self):
         return self._transactionType
     
-    @property
-    def userId(self):
-        return self._userId
-
     @property
     def amount(self):
         return self._money.amount
@@ -68,26 +64,26 @@ class Transaction(AggregateRoot):
     
     @description.setter
     def description(self, newDescription: str):
-        if self.description is None:
+        if newDescription is None:
             raise ValueError("Description cannot be None")
         self._description = newDescription
         self._version += 1
         self._dateUpdated = datetime.now(timezone.utc)
         self._events.append(TransactionDescriptionUpdated(category_id=self.categoryId, 
                                                           new_description=newDescription, 
-                                                          transactionId=self.id, 
+                                                          transactionId=self.id,
                                                           version=self._version))
 
     @categoryId.setter
     def categoryId(self, newCategoryId: str):
-        if self.categoryId is None:
+        if newCategoryId is None:
             raise ValueError("Category ID cannot be None")
         self._categoryId = newCategoryId
         self._version += 1
         self._dateUpdated = datetime.now(timezone.utc)
         self._events.append(TransactionCategoryUpdated(category_id=self.categoryId, 
                                             new_category_name=newCategoryId, 
-                                            transactionId=self.id, 
+                                            transactionId=self.id,
                                             version=self._version))
 
     

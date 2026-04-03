@@ -33,9 +33,11 @@ class EntityId:
 
 @dataclass(frozen=True)
 class Event(ABC):
-    datetime = datetime.now()
-    typeName: str
-    version: int = 0
+    version: int
+
+    def __post_init__(self):
+        object.__setattr__(self, 'datetime', datetime.now())
+        object.__setattr__(self, 'typeName', self.__class__.typeName)
 
     def to_dict(self) -> dict:
         """Serialize event to dictionary."""
