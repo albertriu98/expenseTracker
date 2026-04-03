@@ -8,8 +8,6 @@ class Entity(ABC):
 
 
 class AggregateRoot(Entity):
-    super().__init__()
-
     _events: list[Event]
     _version: int
 
@@ -36,7 +34,7 @@ class EntityId:
 @dataclass(frozen=True)
 class Event(ABC):
     datetime = datetime.now()
-    version: int
+    version: int = 0
     typeName: str
 
     def to_dict(self) -> dict:

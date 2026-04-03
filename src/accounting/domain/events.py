@@ -10,14 +10,12 @@ class TransactionCommitted(Event):
     description: str
     transaction_type: str
     category_id: str = None
-    version: int = 0
 
 @dataclass(frozen=True)
 class AccountCreated(Event):
     typeName = "AccountCreated"
     account_id: str
     initial_balance: MonetaryValue
-    version: int = 0
 
 @dataclass(frozen=True)
 class TransactionCategoryUpdated(Event):
@@ -25,7 +23,6 @@ class TransactionCategoryUpdated(Event):
     transactionId: TransactionId
     category_id: str
     new_category_name: str
-    version: int
 
 @dataclass(frozen=True)
 class TransactionDescriptionUpdated(Event):

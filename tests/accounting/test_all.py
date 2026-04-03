@@ -1,12 +1,13 @@
 import pytest
 from decimal import Decimal
 from uuid import UUID
+from datetime import datetime, timezone
 
 from src.accounting.domain.entities.account import Account
 from src.accounting.domain.entities.transaction import Transaction
 from src.accounting.domain.domain_exceptions import InsufficientFundsException, InvalidCurrencyException
-from src.accounting.domain.events import AccountCreated, TransactionCommitted, categoryUpdated
-from src.accounting.domain.value_objects import MonetaryValue, TransactionType, AccountId
+from src.accounting.domain.events import AccountCreated, TransactionCommitted, TransactionCategoryUpdated, TransactionDescriptionUpdated
+from src.accounting.domain.value_objects import MonetaryValue, TransactionType, AccountId, TransactionId, EntityId
 
 
 def test_monetary_value_creation_and_normalization():
@@ -148,6 +149,206 @@ def test_transaction_entity_basic_behaviour_and_category_update_event():
     txn.categoryId = "tax"
     assert txn.categoryId == "tax"
     assert len(txn._events) == 1
-    assert isinstance(txn._events[0], categoryUpdated)
+    assert isinstance(txn._events[0], TransactionCategoryUpdated)
     assert txn._events[0].new_category_name == "tax"
+
+
+# Tests for EntityId and derived classes
+def test_entity_id_creation():
+    entity_id = EntityId.nextId()
+    assert isinstance(entity_id.value, UUID)
+
+
+def test_transaction_id_creation():
+    txn_id = TransactionId.nextId()
+    assert isinstance(txn_id.value, UUID)
+
+
+def test_account_id_creation():
+    acc_id = AccountId.nextId()
+    assert isinstance(acc_id.value, UUID)
+
+
+# Tests for Events
+def test_account_created_event():
+    mv = MonetaryValue(Decimal("100.00"), "USD")
+    event = AccountCreated(account_id="test_id", initial_balance=mv)
+    assert event.typeName == "AccountCreated"
+    assert event.account_id == "test_id"
+    assert event.initial_balance == mv
+    assert event.version == 0
+
+
+def test_transaction_committed_event():
+    mv = MonetaryValue(Decimal("50.00"), "USD")
+    event = TransactionCommitted(account_id="acc_id", money=mv, description="test", transaction_type="income", category_id="salary")
+    assert event.typeName == "TransactionCommitted"
+    assert event.account_id == "acc_id"
+    assert event.money == mv
+    assert event.description == "test"
+    assert event.transaction_type == "income"
+    assert event.category_id == "salary"
+    assert event.version == 0
+
+
+def test_transaction_category_updated_event():
+    txn_id = TransactionId.nextId()
+    event = TransactionCategoryUpdated(transactionId=txn_id, category_id="old_cat", new_category_name="new_cat", version=1)
+    assert event.typeName == "TransactionCategoryUpdated"
+    assert event.transactionId == txn_id
+    assert event.category_id == "old_cat"
+    assert event.new_category_name == "new_cat"
+    assert event.version == 1
+
+
+def test_transaction_description_updated_event():
+    txn_id = TransactionId.nextId()
+    event = TransactionDescriptionUpdated(transactionId=txn_id, category_id="cat", new_description="new desc", version=1)
+    assert event.typeName == "TransactionDescriptionUpdated"
+    assert event.transactionId == txn_id
+    assert event.category_id == "cat"
+    assert event.new_description == "new desc"
+    assert event.version == 1
+
+
+def test_event_to_dict():
+    mv = MonetaryValue(Decimal("100.00"), "USD")
+    event = AccountCreated(account_id="test_id", initial_balance=mv)
+    data = event.to_dict()
+    assert "account_id" in data
+    assert "initial_balance" in data
+    assert "version" in data
+    assert "typeName" in data
+
+
+# Tests for AggregateRoot
+def test_aggregate_root_events():
+    account = Account(MonetaryValue(Decimal("100.00"), "USD"))
+    events = account.pull_events()
+    assert len(events) == 1
+    assert isinstance(events[0], AccountCreated)
+    # After pulling, events should be cleared
+    assert account.pull_events() == []
+
+
+# Additional Account tests
+def test_account_create_account_classmethod():
+    account = Account.create_account(Decimal("150.00"), "EUR")
+    assert account.getCurrentBalance == Decimal("150.00")
+    assert account.getCurrency == "EUR"
+
+
+def test_account_version_increment_on_operations():
+    account = Account(MonetaryValue(Decimal("100.00"), "USD"))
+    initial_version = account._version
+    account.pull_events()  # clear events
+    account.deposit(MonetaryValue(Decimal("10.00"), "USD"), "test", "misc")
+    assert account._version == initial_version + 1
+
+
+def test_account_date_updated_on_operations():
+    account = Account(MonetaryValue(Decimal("100.00"), "USD"))
+    initial_date = account.dateUpdated
+    account.deposit(MonetaryValue(Decimal("10.00"), "USD"), "test", "misc")
+    assert account.dateUpdated > initial_date
+
+
+# Additional Transaction tests
+def test_transaction_create_transaction_classmethod():
+    acc_id = AccountId.nextId()
+    txn = Transaction.create_transaction("income", acc_id.value, Decimal("25.00"), "USD", "Bonus", "salary")
+    assert txn.transactionType == TransactionType.INCOME
+    assert txn.accountId == acc_id
+    assert txn.amount == Decimal("25.00")
+    assert txn.currency == "USD"
+    assert txn.description == "Bonus"
+    assert txn.categoryId == "salary"
+
+
+def test_transaction_description_setter():
+    acc_id = AccountId.new()
+    txn = Transaction(TransactionType.EXPENSE, acc_id, MonetaryValue(Decimal("10.00"), "USD"), "Old desc", "misc")
+    txn.description = "New desc"
+    assert txn.description == "New desc"
+    assert len(txn._events) == 1
+    assert isinstance(txn._events[0], TransactionDescriptionUpdated)
+    assert txn._events[0].new_description == "New desc"
+
+
+def test_transaction_category_id_setter():
+    acc_id = AccountId.new()
+    txn = Transaction(TransactionType.EXPENSE, acc_id, MonetaryValue(Decimal("10.00"), "USD"), "Test", "old_cat")
+    txn.categoryId = "new_cat"
+    assert txn.categoryId == "new_cat"
+    assert len(txn._events) == 1
+    assert isinstance(txn._events[0], TransactionCategoryUpdated)
+    assert txn._events[0].new_category_name == "new_cat"
+
+
+def test_transaction_equality():
+    acc_id = AccountId.new()
+    mv = MonetaryValue(Decimal("10.00"), "USD")
+    txn1 = Transaction(TransactionType.INCOME, acc_id, mv, "Test", "misc")
+    txn2 = Transaction(TransactionType.INCOME, acc_id, mv, "Test", "misc")
+    txn3 = Transaction(TransactionType.EXPENSE, acc_id, mv, "Test", "misc")
+    
+    assert txn1 == txn1
+    assert txn1 != txn2  # Different IDs
+    assert txn1 != txn3  # Different type
+    assert txn1 != "not a transaction"
+
+
+def test_transaction_str_representation():
+    acc_id = AccountId.new()
+    txn = Transaction(TransactionType.INCOME, acc_id, MonetaryValue(Decimal("25.00"), "USD"), "Bonus", "salary")
+    str_repr = str(txn)
+    assert "Transaction" in str_repr
+    assert "income" in str_repr
+    assert "25.00" in str_repr
+    assert "USD" in str_repr
+
+
+def test_transaction_properties():
+    acc_id = AccountId.new()
+    mv = MonetaryValue(Decimal("30.00"), "EUR")
+    txn = Transaction(TransactionType.EXPENSE, acc_id, mv, "Groceries", "food")
+    
+    assert txn.transactionType == TransactionType.EXPENSE
+    assert txn.accountId == acc_id
+    assert txn.amount == Decimal("30.00")
+    assert txn.currency == "EUR"
+    assert txn.description == "Groceries"
+    assert txn.categoryId == "food"
+    assert isinstance(txn.dateCreated, datetime)
+    assert isinstance(txn.id, UUID)
+
+
+# Tests for domain exceptions
+def test_insufficient_funds_exception():
+    exc = InsufficientFundsException("Test message")
+    assert str(exc) == "Test message"
+
+
+def test_invalid_currency_exception():
+    exc = InvalidCurrencyException("Currency mismatch")
+    assert str(exc) == "Currency mismatch"
+
+
+# Additional MonetaryValue tests
+def test_monetary_value_equality():
+    mv1 = MonetaryValue(Decimal("100.00"), "USD")
+    mv2 = MonetaryValue(Decimal("100.00"), "USD")
+    mv3 = MonetaryValue(Decimal("100.00"), "EUR")
+    mv4 = MonetaryValue(Decimal("50.00"), "USD")
+    
+    assert mv1 == mv2
+    assert mv1 != mv3
+    assert mv1 != mv4
+    assert mv1 != "not monetary value"
+
+
+def test_monetary_value_subtract_insufficient_funds():
+    mv = MonetaryValue(Decimal("10.00"), "USD")
+    with pytest.raises(InsufficientFundsException):
+        mv.subtract(MonetaryValue(Decimal("20.00"), "USD"))
 
