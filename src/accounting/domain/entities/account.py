@@ -1,5 +1,4 @@
 from src.accounting.domain.value_objects import AccountId, MonetaryValue
-from src.accounting.domain.domain_exceptions import InsufficientFundsException, InvalidCurrencyException
 from src.accounting.domain.events import TransactionCommitted, AccountCreated
 from datetime import datetime, timezone
 from src.base import AggregateRoot
@@ -17,6 +16,7 @@ class Account(AggregateRoot):
         now = datetime.now(timezone.utc)
         self._dateCreated = now #timestamp
         self._dateUpdated = now #timestamp
+        self._version = 0
         self.add_event(AccountCreated(account_id=self.accountId, initial_balance=initBalance))
     
     def __str__(self):

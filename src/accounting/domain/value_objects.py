@@ -14,7 +14,6 @@ class TransactionId(EntityId):
 class AccountId(EntityId):
     pass
     
-
 @dataclass(frozen=True)
 class TransactionType(Enum):
     INCOME = "income"
