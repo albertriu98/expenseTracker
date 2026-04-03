@@ -30,7 +30,6 @@ class TransactionDescriptionUpdated(Event):
     transactionId: TransactionId
     category_id: str
     new_description: str
-    version: int
 
 # @dataclass(frozen=True)
 # class TransferCommitted(Event):

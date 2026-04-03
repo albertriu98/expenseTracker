@@ -34,8 +34,8 @@ class EntityId:
 @dataclass(frozen=True)
 class Event(ABC):
     datetime = datetime.now()
-    version: int = 0
     typeName: str
+    version: int = 0
 
     def to_dict(self) -> dict:
         """Serialize event to dictionary."""
