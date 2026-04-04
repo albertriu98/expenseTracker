@@ -9,6 +9,7 @@ class Account(AggregateRoot):
     _currentBalance: MonetaryValue
     _dateCreated: datetime
     _dateUpdated: datetime
+    _version: int
     
     def __init__(self, initBalance: MonetaryValue):
         super().__init__()

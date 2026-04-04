@@ -1,3 +1,3 @@
-class NotificationService:
+class AccountService:
     def __init__(self):
         pass
