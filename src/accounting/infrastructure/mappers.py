@@ -22,7 +22,7 @@ class AccountMapper:
             balance_currency=entity.getCurrency,
             created_at=entity.dateCreated,
             updated_at=entity.dateUpdated,
-            version=entity.getVersion
+            version=entity.version
         )
 
 class TransactionMapper:
@@ -52,5 +52,5 @@ class TransactionMapper:
             categoryId=entity.categoryId,
             created_at=entity.dateCreated,
             updated_at=entity.dateUpdated,
-            version=entity.getVersion
+            version=entity.version
         )

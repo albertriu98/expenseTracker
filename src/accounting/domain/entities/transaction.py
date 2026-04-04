@@ -6,10 +6,10 @@ from src.accounting.domain.events import TransactionCategoryUpdated, Transaction
 from src.base import AggregateRoot
 
 class Transaction(AggregateRoot):
-    def __init__(self, transactionId: TransactionId, transactionType: TransactionType, accountId: AccountId, money: MonetaryValue,  adescription:  str, version: int, dateCreated: datetime, dateUpdated: datetime, categoryId: str = ""):
+    def __init__(self, transactionId: TransactionId, transactionType: TransactionType, accountId: AccountId, money: MonetaryValue,  adescription:  str, version: int, dateCreated: datetime, dateUpdated: datetime, categoryId: str , events: list = []):
         """Do not call this method directly to create new Transactions"""
 
-        super().__init__(version)
+        super().__init__(version, events)
         self._id = transactionId  # value object, immutable
         self._transactionType = transactionType #value object, immutable
         self.accountId = accountId #value object, immutable
@@ -89,4 +89,6 @@ class Transaction(AggregateRoot):
     
     @classmethod
     def create_transaction(cls, transaction_type: str , account_id: UUID, amount: Decimal, currency: str, description: str, categoryId: str):
-       return cls(TransactionId.nextId(), TransactionType(transaction_type), AccountId(account_id), MonetaryValue(amount, currency), description, 0, datetime.now(timezone.utc), datetime.now(timezone.utc), categoryId)
+       transaction_id = TransactionId.nextId()
+       money = MonetaryValue(amount, currency)
+       return cls(transaction_id, TransactionType(transaction_type), AccountId(account_id), money, description, 0, datetime.now(timezone.utc), datetime.now(timezone.utc), categoryId, [])

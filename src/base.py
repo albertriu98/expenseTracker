@@ -11,12 +11,12 @@ class AggregateRoot(Entity):
     _events: list[Event]
     _version: int
 
-    def __init__(self, version: int):
-        self._events = []
+    def __init__(self, version: int, events: list[Event] = []):
+        self._events = events
         self._version = version
     
     @property
-    def getVersion(self):
+    def version(self):
         return self._version
 
     def pull_events(self):
