@@ -18,9 +18,39 @@ class AccountMapper:
     def to_model(entity: Account) -> AccountModel:
         return AccountModel(
             id=entity.id,
-            balance_amount=entity.balance_amount,
-            balance_currency=entity.balance_currency,
-            created_at=entity.created_at,
-            updated_at=entity.updated_at,
-            version=entity.version
+            balance_amount=entity.getCurrentBalance,
+            balance_currency=entity.getCurrency,
+            created_at=entity.dateCreated,
+            updated_at=entity.dateUpdated,
+            version=entity.getVersion
+        )
+
+class TransactionMapper:
+    @staticmethod
+    def to_entity(model: TransactionModel) -> Transaction:
+        return Transaction(
+            transactionId=model.id,
+            transactionType=model.transactionType,
+            accountId=model.accountId,
+            money=MonetaryValue(model.money_amount, model.money_currency),
+            adescription=model.description,
+            categoryId=model.categoryId,
+            dateCreated=model.created_at,
+            dateUpdated=model.updated_at,
+            version=model.version
+        )
+    
+    @staticmethod
+    def to_model(entity: Transaction) -> TransactionModel:
+        return TransactionModel(
+            id=entity.id,
+            transactionType=entity.transactionType.value,
+            accountId=entity.accountId,
+            money_amount=entity.amount,
+            money_currency=entity.currency,
+            description=entity.description,
+            categoryId=entity.categoryId,
+            created_at=entity.dateCreated,
+            updated_at=entity.dateUpdated,
+            version=entity.getVersion
         )

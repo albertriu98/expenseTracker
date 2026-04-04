@@ -58,6 +58,10 @@ class Transaction(AggregateRoot):
     def dateCreated(self):
         return self._dateCreated
     
+    @property
+    def dateUpdated(self):
+        return self._dateUpdated
+    
     @description.setter
     def description(self, newDescription: str):
         if newDescription is None:

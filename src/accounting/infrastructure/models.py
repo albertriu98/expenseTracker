@@ -14,8 +14,8 @@ class TransactionModel(SQLModel, table=True):
     id: str = Field(primary_key=True)
     accountId: str = Field(foreign_key="accountmodel.id")
     transactionType: str
-    amount: float
-    currency: str
+    money_amount: float
+    money_currency: str
     description: str
     categoryId: str
     created_at: datetime 
