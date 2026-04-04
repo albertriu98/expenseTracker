@@ -1,6 +1,6 @@
 from src.accounting.domain.entities.account import Account
 from src.accounting.domain.entities.transaction import Transaction
-from src.accounting.infrastructure.mappers import AccountMapper
+from src.accounting.infrastructure.mappers import AccountMapper, TransactionMapper
 from src.accounting.infrastructure.models import AccountModel, TransactionModel
 from sqlmodel import SQLModel, Session, create_engine, select, update
 from datetime import datetime
@@ -43,12 +43,12 @@ class TransactionRepository:
         transaction = self.session.exec(statement).first()
         if not transaction:
             raise ValueError(f"Transaction with id {transaction_id} not found for account {account_id}")
-        return transaction
+        return TransactionMapper.to_entity(transaction)
     
     def get_all_by_account_id(self, account_id: str) -> list[Transaction]:
         statement = select(Transaction).where(Transaction.accountId == account_id)
         results = self.session.exec(statement).all()
-        return results
+        return [TransactionMapper.to_entity(transaction) for transaction in results]
     
     def get_by_time_range(self, account_id: str, start_date: datetime, end_date: datetime) -> list[Transaction]:
         statement = select(Transaction).where(
@@ -57,7 +57,7 @@ class TransactionRepository:
             Transaction.dateCreated <= end_date
         )
         results = self.session.exec(statement).all()
-        return results
+        return [TransactionMapper.to_entity(transaction) for transaction in results]
     
     def  get_by_category_and_account_id(self, account_id: str, category_id: str) -> list[Transaction]:
         statement = select(Transaction).where(
@@ -65,16 +65,17 @@ class TransactionRepository:
             Transaction.categoryId == category_id
         )
         results = self.session.exec(statement).all()
-        return results
+        return [TransactionMapper.to_entity(transaction) for transaction in results]
 
     def save(self, transaction: Transaction) -> None:
         sql_transaction = self.session.get(Transaction, transaction.id)
+        model =TransactionMapper.to_model(transaction)
         if sql_transaction:
             if transaction.version != sql_transaction.version + 1:
                 raise Exception("Concurrency conflict")
-            self.session.merge(transaction)
+            self.session.merge(model)
         else:
-            self.session.add(transaction)
+            self.session.add(model)
 
         self.session.commit()
 
