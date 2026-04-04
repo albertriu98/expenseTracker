@@ -6,22 +6,18 @@ from src.accounting.domain.events import TransactionCategoryUpdated, Transaction
 from src.base import AggregateRoot
 
 class Transaction(AggregateRoot):
-    def __init__(self, transactionType: TransactionType, accountId: AccountId, money: MonetaryValue,  description:  str, categoryId: str = ""):
+    def __init__(self, transactionId: TransactionId, transactionType: TransactionType, accountId: AccountId, money: MonetaryValue,  adescription:  str, categoryId: str = "", version: int , dateCreated: datetime , dateUpdated: datetime):
         """Do not call this method directly to create new Transactions"""
 
-        super().__init__()
-        self._id = TransactionId.nextId()  # value object, immutable
+        super().__init__(version)
+        self._id = transactionId  # value object, immutable
         self._transactionType = transactionType #value object, immutable
         self.accountId = accountId #value object, immutable
         self._money = money #value object immutable
-        self._description = description #attribute
+        self._description = adescription #attribute
         self._categoryId = categoryId #attribute
-        now = datetime.now(timezone.utc)
-        self._dateCreated = now
-        self._dateUpdated = now
-        self._version = 0
-        self._events = []
-
+        self._dateCreated = dateCreated
+        self._dateUpdated = dateUpdated
 
     def __str__(self):
         return f"Transaction(id={self.id}, transactionType='{self.transactionType.value}', amount={self.amount}, currency='{self.currency}', description='{self.description}', categoryId='{self.categoryId}')"
@@ -89,4 +85,4 @@ class Transaction(AggregateRoot):
     
     @classmethod
     def create_transaction(cls, transaction_type: str , account_id: UUID, amount: Decimal, currency: str, description: str, categoryId: str):
-       return cls(TransactionType(transaction_type), AccountId(account_id), MonetaryValue(amount, currency), description, categoryId, )
+       return cls(TransactionId.nextId(), TransactionType(transaction_type), AccountId(account_id), MonetaryValue(amount, currency), description, categoryId, 0, datetime.now(timezone.utc), datetime.now(timezone.utc))
