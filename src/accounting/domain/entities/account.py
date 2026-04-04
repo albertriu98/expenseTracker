@@ -12,12 +12,12 @@ class Account(AggregateRoot):
     _version: int
     
     def __init__(self, accountId: AccountId, aBalance: MonetaryValue, dateCreated: datetime, dateUpdated: datetime, version: int):
-        super().__init__()
+        super().__init__(version)
         self._accountId = accountId
         self._currentBalance = aBalance
         self._dateCreated = dateCreated
         self._dateUpdated = dateUpdated
-        self._version = version
+
     
     def __str__(self):
         return f"Account(id={self.accountId}, currentBalance={self.currentBalance}, currency='{self.currency}', dateCreated='{self.dateCreated}', dateUpdated='{self.dateUpdated}')"

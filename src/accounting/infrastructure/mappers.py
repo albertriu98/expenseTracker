@@ -21,5 +21,6 @@ class AccountMapper:
             balance_amount=entity.balance_amount,
             balance_currency=entity.balance_currency,
             created_at=entity.created_at,
-            updated_at=entity.updated_at
+            updated_at=entity.updated_at,
+            version=entity.version
         )

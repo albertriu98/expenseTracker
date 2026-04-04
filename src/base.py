@@ -11,9 +11,9 @@ class AggregateRoot(Entity):
     _events: list[Event]
     _version: int
 
-    def __init__(self):
+    def __init__(self, version: int):
         self._events = []
-        self._version = 0
+        self._version = version
 
     def pull_events(self):
         events = self._events[:]
