@@ -10,7 +10,8 @@ class AccountMapper:
             accountId=model.id,
             currentBalance=MonetaryValue(model.balance_amount, model.balance_currency),
             dateCreated=model.created_at,
-            dateUpdated=model.updated_at
+            dateUpdated=model.updated_at,
+            version=model.version
         )
     
     @staticmethod

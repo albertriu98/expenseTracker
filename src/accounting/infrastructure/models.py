@@ -9,3 +9,15 @@ class AccountModel(SQLModel, table=True):
     created_at: datetime 
     updated_at: datetime
     version: int
+
+class TransactionModel(SQLModel, table=True):
+    id: str = Field(primary_key=True)
+    accountId: str = Field(foreign_key="accountmodel.id")
+    transactionType: str
+    amount: float
+    currency: str
+    description: str
+    categoryId: str
+    created_at: datetime 
+    updated_at: datetime
+    version: int

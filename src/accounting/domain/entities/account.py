@@ -11,15 +11,13 @@ class Account(AggregateRoot):
     _dateUpdated: datetime
     _version: int
     
-    def __init__(self, initBalance: MonetaryValue):
+    def __init__(self, accountId: AccountId, aBalance: MonetaryValue, dateCreated: datetime, dateUpdated: datetime, version: int):
         super().__init__()
-        self._accountId = AccountId.nextId()
-        self._currentBalance = initBalance
-        now = datetime.now(timezone.utc)
-        self._dateCreated = now #timestamp
-        self._dateUpdated = now #timestamp
-        self._version = 0
-        self.add_event(AccountCreated(account_id=self.accountId, initial_balance=initBalance, version=self._version))
+        self._accountId = accountId
+        self._currentBalance = aBalance
+        self._dateCreated = dateCreated
+        self._dateUpdated = dateUpdated
+        self._version = version
     
     def __str__(self):
         return f"Account(id={self.accountId}, currentBalance={self.currentBalance}, currency='{self.currency}', dateCreated='{self.dateCreated}', dateUpdated='{self.dateUpdated}')"
@@ -68,4 +66,4 @@ class Account(AggregateRoot):
 
     @classmethod
     def create_account(cls, amount: Decimal, currency: str):
-        return cls(MonetaryValue(amount, currency))
+        return cls(AccountId.nextId(), MonetaryValue(amount, currency), datetime.now(timezone.utc), datetime.now(timezone.utc), 0)
