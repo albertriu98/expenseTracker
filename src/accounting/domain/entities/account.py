@@ -18,6 +18,7 @@ class Account(AggregateRoot):
         self._dateCreated = dateCreated
         self._dateUpdated = dateUpdated
 
+
     
     def __str__(self):
         return f"Account(id={self.accountId}, currentBalance={self.currentBalance}, currency='{self.currency}', dateCreated='{self.dateCreated}', dateUpdated='{self.dateUpdated}')"
