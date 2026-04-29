@@ -3,7 +3,8 @@ from src.accounting.domain.value_objects import MonetaryValue
 from src.accounting.application.commands import CreateAccountCommand
 from src.accounting.domain.entities.transaction import Transaction
 from src.accounting.infrastructure.repositories import AccountRepository, TransactionRepository
-class AccountService:
+
+class CreateAccountHandler:
     def __init__(self):
         pass
     
