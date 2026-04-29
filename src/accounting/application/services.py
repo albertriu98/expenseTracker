@@ -1,10 +1,10 @@
 from src.accounting.domain.entities.account import Account
 from src.accounting.domain.value_objects import MonetaryValue
-from src.accounting.application.commands import CreateAccountCommand
+from src.accounting.application.commands import CreateAccountCommand, CommitTransactionCommand
 from src.accounting.domain.entities.transaction import Transaction
 from src.accounting.infrastructure.repositories import AccountRepository, TransactionRepository
 
-class CreateAccountHandler:
+class AccountHandler:
     def __init__(self):
         pass
     
