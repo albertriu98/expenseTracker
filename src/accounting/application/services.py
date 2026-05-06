@@ -5,7 +5,6 @@ from src.accounting.domain.entities.transaction import Transaction
 from src.accounting.infrastructure.repositories import AccountRepository, TransactionRepository
 from src.accounting.infrastructure.event_store.event_store import EventStore
 
-
 class AccountHandler:
     def __init__(self):
         self.account_repository = AccountRepository()  
@@ -16,11 +15,11 @@ class AccountHandler:
         try:
             self.account_repository.save(account)
             self.event_store.append(account.pull_events())  # Append events to the event store
-            return account.accountId
         except Exception as e:
             # Handle the exception (e.g., log the error, rollback the transaction)
             raise e
-        
+        return account.accountId
+    
     def commit_transaction(self, aCommand: CommitTransactionCommand):
         #Retrieve account by id
         account = self.account_repository.get_by_id(aCommand.accountId)
