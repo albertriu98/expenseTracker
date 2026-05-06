@@ -3,19 +3,19 @@ from src.accounting.domain.value_objects import MonetaryValue
 from src.accounting.application.commands import CreateAccountCommand, CommitTransactionCommand
 from src.accounting.domain.entities.transaction import Transaction
 from src.accounting.infrastructure.repositories import AccountRepository, TransactionRepository
-from src.accounting.infrastructure.domain_event_publisher import RabbitMQEventPublisher
+from src.accounting.infrastructure.event_store.event_store import EventStore
+
 
 class AccountHandler:
     def __init__(self):
-        self.account_repository = AccountRepository()
-        self.event_publisher = RabbitMQEventPublisher()
+        self.account_repository = AccountRepository()  
+        self.event_store = EventStore()  # Assuming EventStore also handles publishing events
     
     def create_account(self, aCommand: CreateAccountCommand):  
         account = Account.create_account(aCommand.amount, aCommand.currency)
         try:
             self.account_repository.save(account)
-            #Call EventPublisher to publish events in event store
-            self.event_publisher.publish(account.pull_events())
+            self.event_store.append(account.pull_events())  # Append events to the event store
             return account.accountId
         except Exception as e:
             # Handle the exception (e.g., log the error, rollback the transaction)
@@ -31,7 +31,7 @@ class AccountHandler:
                 account.withdraw(MonetaryValue(aCommand.amount, aCommand.currency), aCommand.description, aCommand.category)
             #Call event publisher to publish events in event store
             self.account_repository.save(account)
-            self.event_publisher.publish(account.pull_events())
+            self.event_store.append(account.pull_events())
         except Exception as e:
             # Handle the exception (e.g., log the error, rollback the transaction)
             raise e
