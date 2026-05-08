@@ -16,7 +16,7 @@ account_handler = AccountHandler()  # You would typically inject dependencies he
 async def create_account(amount: float, currency: str):
     # Placeholder implementation for creating an account
     account_id = account_handler.create_account(CreateAccountCommand(amount=amount, currency=currency))
-    return ["Account created successfully"]
+    return {"message": "Account created successfully", "account_id": account_id}
 
 @router.post("/commit_transaction")
 async def commit_transaction(accountId: str, amount: float, currency: str, description: str, category: str, transactionType: str):
