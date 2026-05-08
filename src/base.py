@@ -41,17 +41,18 @@ class Event(ABC):
 
     def __post_init__(self):
         object.__setattr__(self, 'datetime', datetime.now())
-        object.__setattr__(self, 'typeName', self.__class__.typeName)
+        object.__setattr__(self, 'eventType', self.__class__.typeName)
 
     def to_dict(self) -> dict:
         """Serialize event to dictionary."""
-        data = {}
+        payload = {}
         for key, value in self.__dict__.items():
             if isinstance(value, datetime):
-                data[key] = value.isoformat()
+                payload[key] = value.isoformat()
             else:
-                data[key] = value
-        return data
+                payload[key] = value
+        eventType = self.__class__.typeName
+        return {'eventType': eventType, 'payload': payload}
 
 
     @classmethod

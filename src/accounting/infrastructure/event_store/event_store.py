@@ -8,7 +8,10 @@ class EventStore:
 
     def append(self, events):
         for event in events:
-            self.session.add(event)
+            serialized = event.to_dict()
+            self.session.add(Event(event_type=serialized['eventType'], 
+                                   payload=str(serialized['payload']), 
+                                   published=False))
         self.session.commit()
 
     def get_unpublished_events(self):

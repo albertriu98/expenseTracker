@@ -6,11 +6,11 @@ from src.accounting.infrastructure.repositories import AccountRepository, Transa
 from src.accounting.infrastructure.event_store.event_store import EventStore
 
 class AccountHandler:
-    def __init__(self):
-        self.account_repository = AccountRepository()  
-        self.event_store = EventStore()  # Assuming EventStore also handles publishing events
-    
-    def create_account(self, aCommand: CreateAccountCommand):  
+    def __init__(self, account_repository: AccountRepository, event_store: EventStore):
+        self.account_repository = account_repository
+        self.event_store = event_store
+
+    def create_account(self, aCommand: CreateAccountCommand):
         account = Account.create_account(aCommand.amount, aCommand.currency)
         try:
             self.account_repository.save(account)
