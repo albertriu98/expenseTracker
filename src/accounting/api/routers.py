@@ -21,5 +21,5 @@ async def create_account(amount: float, currency: str):
 @router.post("/commit_transaction")
 async def commit_transaction():
     # Placeholder implementation for committing a transaction
-    current_balance = account_handler.commit_transaction()
+    current_balance = account_handler.commit_transaction(CommitTransactionCommand())
     return {"message": "Transaction committed successfully", "current_balance": current_balance}
