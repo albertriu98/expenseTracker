@@ -2,7 +2,7 @@ from src.accounting.domain.entities.account import Account
 from src.accounting.domain.value_objects import MonetaryValue
 from src.accounting.application.commands import CreateAccountCommand, CommitTransactionCommand
 from src.accounting.domain.entities.transaction import Transaction
-from src.accounting.infrastructure.repositories import AccountRepository, TransactionRepository
+from src.accounting.infrastructure.repositories.repositories import AccountRepository, TransactionRepository
 from src.accounting.infrastructure.event_store.event_store import EventStore
 
 class AccountHandler:
