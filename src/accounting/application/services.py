@@ -10,7 +10,6 @@ class AccountHandler:
     def __init__(self, session: Session):
         self.session = session
         self.account_repository = AccountRepository(session)
-        self.transaction_repository = TransactionRepository(session)
         self.event_store = EventStore(session)
 
     def create_account(self, aCommand: CreateAccountCommand):
