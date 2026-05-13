@@ -76,8 +76,6 @@ class TransactionRepository:
         else:
             self.session.add(model)
 
-
-
     def delete_by_account_id(self, account_id: str) -> None:
         statement = select(TransactionModel).where(TransactionModel.accountId == account_id)
         transactions = self.session.exec(statement).all()
