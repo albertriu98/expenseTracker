@@ -4,6 +4,7 @@ from src.accounting.application.commands import CreateAccountCommand, CommitTran
 from src.accounting.domain.entities.transaction import Transaction
 from src.accounting.infrastructure.repositories.repositories import AccountRepository, TransactionRepository
 from src.accounting.infrastructure.event_store.event_store import EventStore
+from sqlmodel import Session
 
 class AccountHandler:
     def __init__(self, session: Session):
