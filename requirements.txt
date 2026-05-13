@@ -1,3 +1,4 @@
 pytest
 sqlmodel
 pika
+fastapi
