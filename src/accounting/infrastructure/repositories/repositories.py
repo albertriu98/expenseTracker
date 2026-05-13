@@ -25,14 +25,13 @@ class AccountRepository:
         else:
             self.session.add(model)
 
-        self.session.commit()
     
     def delete(self, account_id: str) -> None:
         account = self.session.get(AccountModel, account_id)
         if not account:
             raise ValueError(f"Account with id {account_id} not found")
         self.session.delete(account)
-        self.session.commit()
+
   
 class TransactionRepository:
     def __init__(self, session: Session):
@@ -77,11 +76,10 @@ class TransactionRepository:
         else:
             self.session.add(model)
 
-        self.session.commit()
+
 
     def delete_by_account_id(self, account_id: str) -> None:
         statement = select(TransactionModel).where(TransactionModel.accountId == account_id)
         transactions = self.session.exec(statement).all()
         for transaction in transactions:
             self.session.delete(transaction)
-        self.session.commit()

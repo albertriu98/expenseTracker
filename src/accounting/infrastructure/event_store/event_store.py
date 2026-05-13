@@ -12,11 +12,9 @@ class EventStore:
             self.session.add(Event(event_type=serialized['eventType'], 
                                    payload=str(serialized['payload']), 
                                    published=False))
-        self.session.commit()
 
     def get_unpublished_events(self):
         return self.session.exec(select(Event).where(Event.published == False)).all()
     
     def mark_as_published(self, event_ids):
         self.session.exec(update(Event).where(Event.id.in_(event_ids)).values(published=True, published_at=datetime.now()))
-        self.session.commit()
