@@ -3,11 +3,12 @@ from decimal import Decimal
 from uuid import UUID
 from datetime import datetime, timezone
 
-from src.accounting.domain.entities.account import Account
-from src.accounting.domain.entities.transaction import Transaction
-from src.accounting.domain.domain_exceptions import InsufficientFundsException, InvalidCurrencyException
-from src.accounting.domain.events import AccountCreated, TransactionCommitted, TransactionCategoryUpdated, TransactionDescriptionUpdated
-from src.accounting.domain.value_objects import MonetaryValue, TransactionType, AccountId, TransactionId, EntityId
+from src.accounting.src.domain.entities.account import Account
+from src.accounting.src.domain.entities.transaction import Transaction
+from src.accounting.src.domain.domain_exceptions import InsufficientFundsException, InvalidCurrencyException
+from src.accounting.src.domain.events import AccountCreated, TransactionCommitted, TransactionCategoryUpdated, TransactionDescriptionUpdated
+from src.accounting.src.domain.value_objects import MonetaryValue, TransactionType, AccountId, TransactionId
+from src.base import EntityId
 
 
 def test_monetary_value_creation_and_normalization():
@@ -58,7 +59,7 @@ def test_transaction_type_enum_values():
 
 
 def test_account_creation_initial_event_and_balance():
-    account = Account(MonetaryValue(Decimal("200.00"), "CAD"))
+    account = Account.create_account(Decimal("200.00"), "CAD")
 
     assert account.getCurrentBalance == Decimal("200.00")
     assert account.getCurrency == "CAD"
@@ -73,7 +74,7 @@ def test_account_creation_initial_event_and_balance():
 
 
 def test_account_deposit_creates_transaction_event_and_updates_balance():
-    account = Account(MonetaryValue(Decimal("100.00"), "USD"))
+    account = Account.create_account(Decimal("100.00"), "USD")
     account.pull_events()  # clear initial event
 
     account.deposit(MonetaryValue(Decimal("50.00"), "USD"), "Paycheck", "salary")
@@ -88,7 +89,7 @@ def test_account_deposit_creates_transaction_event_and_updates_balance():
 
 
 def test_account_event_store_contains_transaction_committed_after_deposit():
-    account = Account(MonetaryValue(Decimal("100.00"), "USD"))
+    account = Account.create_account(Decimal("100.00"), "USD")
     account.pull_events()  # clear initial AccountCreated event
 
     account.deposit(MonetaryValue(Decimal("25.00"), "USD"), "Side gig", "income")
@@ -101,7 +102,7 @@ def test_account_event_store_contains_transaction_committed_after_deposit():
 
 
 def test_account_withdraw_creates_transaction_event_and_updates_balance():
-    account = Account(MonetaryValue(Decimal("100.00"), "USD"))
+    account = Account.create_account(Decimal("100.00"), "USD")
     account.pull_events()  # clear initial event
 
     account.withdraw(MonetaryValue(Decimal("40.00"), "USD"), "Groceries", "food")
@@ -115,14 +116,14 @@ def test_account_withdraw_creates_transaction_event_and_updates_balance():
 
 
 def test_account_insufficient_funds_raises():
-    account = Account(MonetaryValue(Decimal("10.00"), "USD"))
+    account = Account.create_account(Decimal("10.00"), "USD")
 
     with pytest.raises(InsufficientFundsException):
         account.withdraw(MonetaryValue(Decimal("20.00"), "USD"), "Rent", "housing")
 
 
 def test_account_invalid_currency_transaction_raises():
-    account = Account(MonetaryValue(Decimal("100.00"), "USD"))
+    account = Account.create_account(Decimal("100.00"), "USD")
 
     with pytest.raises(InvalidCurrencyException):
         account.deposit(MonetaryValue(Decimal("10.00"), "EUR"), "Transfer", "misc")
@@ -133,7 +134,7 @@ def test_account_invalid_currency_transaction_raises():
 
 def test_transaction_entity_basic_behaviour_and_category_update_event():
     account_id = AccountId.nextId()
-    txn = Transaction(TransactionType.INCOME, account_id, MonetaryValue(Decimal("25.00"), "USD"), "Bonus", "salary")
+    txn = Transaction.create_transaction("income", account_id.value, Decimal("25.00"), "USD", "Bonus", "salary")
 
     assert txn.transactionType == TransactionType.INCOME
     assert txn.accountId == account_id
@@ -142,8 +143,7 @@ def test_transaction_entity_basic_behaviour_and_category_update_event():
     assert txn.description == "Bonus"
     assert txn.categoryId == "salary"
 
-    original_id = txn.id
-    other = Transaction(TransactionType.EXPENSE, account_id, MonetaryValue(Decimal("1.00"), "USD"), "Test", "misc")
+    other = Transaction.create_transaction("expense", account_id.value, Decimal("1.00"), "USD", "Test", "misc")
     assert txn != other
     assert txn == txn
 
@@ -216,15 +216,15 @@ def test_event_to_dict():
     mv = MonetaryValue(Decimal("100.00"), "USD")
     event = AccountCreated(account_id="test_id", initial_balance=mv, version=0)
     data = event.to_dict()
-    assert "account_id" in data
-    assert "initial_balance" in data
-    assert "version" in data
-    assert "typeName" in data
+    assert "account_id" in data['payload']
+    assert "initial_balance" in data['payload']
+    assert "version" in data['payload']
+    assert "eventType" in data
 
 
 # Tests for AggregateRoot
 def test_aggregate_root_events():
-    account = Account(MonetaryValue(Decimal("100.00"), "USD"))
+    account = Account.create_account(Decimal("100.00"), "USD")
     events = account.pull_events()
     assert len(events) == 1
     assert isinstance(events[0], AccountCreated)
@@ -240,7 +240,7 @@ def test_account_create_account_classmethod():
 
 
 def test_account_version_increment_on_operations():
-    account = Account(MonetaryValue(Decimal("100.00"), "USD"))
+    account = Account.create_account(Decimal("100.00"), "USD")
     initial_version = account._version
     account.pull_events()  # clear events
     account.deposit(MonetaryValue(Decimal("10.00"), "USD"), "test", "misc")
@@ -248,7 +248,7 @@ def test_account_version_increment_on_operations():
 
 
 def test_account_date_updated_on_operations():
-    account = Account(MonetaryValue(Decimal("100.00"), "USD"))
+    account = Account.create_account(Decimal("100.00"), "USD")
     initial_date = account.dateUpdated
     account.deposit(MonetaryValue(Decimal("10.00"), "USD"), "test", "misc")
     assert account.dateUpdated > initial_date
@@ -268,7 +268,7 @@ def test_transaction_create_transaction_classmethod():
 
 def test_transaction_description_setter():
     acc_id = AccountId.nextId()
-    txn = Transaction(TransactionType.EXPENSE, acc_id, MonetaryValue(Decimal("10.00"), "USD"), "Old desc", "misc")
+    txn = Transaction.create_transaction("expense", acc_id.value, Decimal("10.00"), "USD", "Old desc", "misc")
     txn.description = "New desc"
     assert txn.description == "New desc"
     assert len(txn._events) == 1
@@ -278,7 +278,7 @@ def test_transaction_description_setter():
 
 def test_transaction_category_id_setter():
     acc_id = AccountId.nextId()
-    txn = Transaction(TransactionType.EXPENSE, acc_id, MonetaryValue(Decimal("10.00"), "USD"), "Test", "old_cat")
+    txn = Transaction.create_transaction("expense", acc_id.value, Decimal("10.00"), "USD", "Test", "old_cat")
     txn.categoryId = "new_cat"
     assert txn.categoryId == "new_cat"
     assert len(txn._events) == 1
@@ -288,20 +288,19 @@ def test_transaction_category_id_setter():
 
 def test_transaction_equality():
     acc_id = AccountId.nextId()
-    mv = MonetaryValue(Decimal("10.00"), "USD")
-    txn1 = Transaction(TransactionType.INCOME, acc_id, mv, "Test", "misc")
-    txn2 = Transaction(TransactionType.INCOME, acc_id, mv, "Test", "misc")
-    txn3 = Transaction(TransactionType.EXPENSE, acc_id, mv, "Test", "misc")
-    
+    txn1 = Transaction.create_transaction("income", acc_id.value, Decimal("10.00"), "USD", "Test", "misc")
+    txn2 = Transaction.create_transaction("income", acc_id.value, Decimal("10.00"), "USD", "Test", "misc")
+    txn3 = Transaction.create_transaction("expense", acc_id.value, Decimal("10.00"), "USD", "Test", "misc")
+
     assert txn1 == txn1
     assert txn1 != txn2  # Different IDs
-    assert txn1 != txn3  # Different type
+    assert txn1 != txn3  # Different IDs
     assert txn1 != "not a transaction"
 
 
 def test_transaction_str_representation():
     acc_id = AccountId.nextId()
-    txn = Transaction(TransactionType.INCOME, acc_id, MonetaryValue(Decimal("25.00"), "USD"), "Bonus", "salary")
+    txn = Transaction.create_transaction("income", acc_id.value, Decimal("25.00"), "USD", "Bonus", "salary")
     str_repr = str(txn)
     assert "Transaction" in str_repr
     assert "income" in str_repr
@@ -311,9 +310,8 @@ def test_transaction_str_representation():
 
 def test_transaction_properties():
     acc_id = AccountId.nextId()
-    mv = MonetaryValue(Decimal("30.00"), "EUR")
-    txn = Transaction(TransactionType.EXPENSE, acc_id, mv, "Groceries", "food")
-    
+    txn = Transaction.create_transaction("expense", acc_id.value, Decimal("30.00"), "EUR", "Groceries", "food")
+
     assert txn.transactionType == TransactionType.EXPENSE
     assert txn.accountId == acc_id
     assert txn.amount == Decimal("30.00")
@@ -341,7 +339,7 @@ def test_monetary_value_equality():
     mv2 = MonetaryValue(Decimal("100.00"), "USD")
     mv3 = MonetaryValue(Decimal("100.00"), "EUR")
     mv4 = MonetaryValue(Decimal("50.00"), "USD")
-    
+
     assert mv1 == mv2
     assert mv1 != mv3
     assert mv1 != mv4
@@ -352,4 +350,3 @@ def test_monetary_value_subtract_insufficient_funds():
     mv = MonetaryValue(Decimal("10.00"), "USD")
     with pytest.raises(InsufficientFundsException):
         mv.subtract(MonetaryValue(Decimal("20.00"), "USD"))
-
