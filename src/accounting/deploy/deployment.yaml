@@ -16,17 +16,23 @@ spec:
     spec:
       containers:
       - name: api
-        image: albertriu/accounting-api:0.0.1
+        image: albertriu1998/accounting-api:0.0.1
         ports:
         - containerPort: 8000
         env:
         - name: DB_HOST
-          value: "postgresql"
+          value: "accounting-db-rw"
         - name: DB_PORT
           value: "5432"
         - name: DB_NAME
           value: "accounting"
         - name: DB_USER
-          value: "accounting_user"
+          valueFrom:
+            secretKeyRef:
+              name: accounting-db-credentials
+              key: username
         - name: DB_PASSWORD
-          value: "accounting_password"
+          valueFrom:
+            secretKeyRef:
+              name: accounting-db-credentials
+              key: password

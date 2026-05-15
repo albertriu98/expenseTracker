@@ -1,0 +1,27 @@
+# Credentials secret — in production replace with Sealed Secrets / External Secrets
+apiVersion: v1
+kind: Secret
+metadata:
+  name: accounting-db-credentials
+type: Opaque
+stringData:
+  username: accounting_user
+  password: accounting_password
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: accounting-db
+spec:
+  instances: 1
+  bootstrap:
+    initdb:
+      database: accounting
+      owner: accounting_user
+      secret:
+        name: accounting-db-credentials
+  storage:
+    resizeInUseVolumes: true
+    size: 1Gi
+    storageClass: local-path
+

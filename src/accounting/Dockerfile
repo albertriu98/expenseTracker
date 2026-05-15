@@ -1,4 +1,4 @@
-# Build from project root:
+# Build from project root so the full src/ tree is available:
 #   docker build -f src/accounting/Dockerfile -t albertriu/accounting-api:0.0.1 .
 
 FROM python:3.13-slim
@@ -10,8 +10,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         gcc \
     && rm -rf /var/lib/apt/lists/*
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt uvicorn[standard] psycopg2-binary
+COPY src/accounting/requirements.txt requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 COPY src/ src/
 

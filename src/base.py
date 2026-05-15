@@ -2,6 +2,7 @@ from dataclasses import dataclass
 import uuid
 from abc import ABC
 from datetime import datetime
+from src.accounting.src.domain.events import Event
 
 class Entity(ABC):
     pass
