@@ -1,0 +1,34 @@
+from src.accounting.src.domain.entities.account import Account
+from src.accounting.src.domain.value_objects import MonetaryValue
+from src.accounting.src.api.application.commands import CreateAccountCommand, CommitTransactionCommand
+from src.accounting.src.domain.entities.transaction import Transaction
+from src.accounting.src.infrastructure.repositories.repositories import AccountRepository
+from src.accounting.src.infrastructure.event_store.event_store import EventStore
+from sqlmodel import Session
+
+class AccountHandler:
+    def __init__(self, session: Session):
+        self.session = session
+        self.account_repository = AccountRepository(session)
+        self.event_store = EventStore(session)
+
+    def create_account(self, aCommand: CreateAccountCommand):
+        account = Account.create_account(aCommand.amount, aCommand.currency)
+        self.account_repository.save(account)
+        self.event_store.append(account.pull_events())  # Append events to the event store
+        return account.accountId
+    
+    def commit_transaction(self, aCommand: CommitTransactionCommand):
+        #Retrieve account by id
+        account = self.account_repository.get_by_id(aCommand.accountId)
+        if aCommand.transactionType == "income":
+            account.deposit(MonetaryValue(aCommand.amount, aCommand.currency), aCommand.description, aCommand.category)
+        elif aCommand.transactionType == "expense":
+            account.withdraw(MonetaryValue(aCommand.amount, aCommand.currency), aCommand.description, aCommand.category)
+        #Call event publisher to publish events in event store
+        self.account_repository.save(account)
+        self.event_store.append(account.pull_events())
+        return  account.getCurrentBalance
+    
+
+

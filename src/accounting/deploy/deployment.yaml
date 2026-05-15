@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: accounting-api
+  labels:
+    app: accounting-api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: accounting-api
+  template:
+    metadata:
+      labels:
+        app: accounting-api
+    spec:
+      containers:
+      - name: api
+        image: albertriu/accounting-api:0.0.1
+        ports:
+        - containerPort: 8000
+        env:
+        - name: DB_HOST
+          value: "postgresql"
+        - name: DB_PORT
+          value: "5432"
+        - name: DB_NAME
+          value: "accounting"
+        - name: DB_USER
+          value: "accounting_user"
+        - name: DB_PASSWORD
+          value: "accounting_password"
