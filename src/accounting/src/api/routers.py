@@ -2,7 +2,8 @@ from fastapi import APIRouter, Depends
 from typing import List
 from src.accounting.src.application.services import AccountHandler
 from src.accounting.src.application.commands import CreateAccountCommand, CommitTransactionCommand
-from src.accounting.src.infrastructure.database.session import SessionDep
+from src.accounting.src.infrastructure.database.session import get_session
+from sqlmodel import Session
 
 
 router = APIRouter(
@@ -11,7 +12,7 @@ router = APIRouter(
     responses={404: {"description": "Not found"}},
 )
 
-def get_handler(session: SessionDep):
+def get_handler(session: Session = Depends(get_session)):
     return AccountHandler(session)
 
 @router.post("/create_account")

@@ -17,7 +17,7 @@ class AccountMapper:
     @staticmethod
     def to_model(entity: Account) -> AccountModel:
         return AccountModel(
-            id=entity.id,
+            id=entity.accountId.value,
             balance_amount=entity.getCurrentBalance,
             balance_currency=entity.getCurrency,
             created_at=entity.dateCreated,

@@ -5,53 +5,53 @@ class CreateAccountCommand:
     currency : str
 
     def __init__(self, amount, currency):
-        self.amount = amount
-        self.currency = currency
-    
+        self._amount = amount
+        self._currency = currency
+
     @property
     def amount(self):
-        return self.amount
+        return self._amount
     
     @property
     def currency(self):
-        return self.currency
+        return self._currency
     
 class CommitTransactionCommand:
-    accountId: str
-    amount: Decimal
-    currency: str
-    description: str
-    category: str
-    transactionType: str
+    _accountId: str
+    _amount: Decimal
+    _currency: str
+    _description: str
+    _category: str
+    _transactionType: str
 
     def __init__(self, accountId, amount, currency, description, category, transactionType):
-        self.accountId = accountId
-        self.amount = amount
-        self.currency = currency
-        self.description = description
-        self.category = category
-        self.transactionType = transactionType
-    
+        self._accountId = accountId
+        self._amount = amount
+        self._currency = currency
+        self._description = description
+        self._category = category
+        self._transactionType = transactionType
+
     @property
     def accountId(self):
-        return self.accountId
+        return self._accountId
     
     @property
     def amount(self):
-        return self.amount
+        return self._amount
     
     @property
     def currency(self):
-        return self.currency
+        return self._currency
     
     @property
     def description(self):
-        return self.description
+        return self._description
     
     @property
     def category(self):
-        return self.category
+        return self._category
     
     @property
     def transactionType(self):
-        return self.transactionType
+        return self._transactionType

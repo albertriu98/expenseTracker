@@ -1,8 +1,9 @@
 from sqlmodel import SQLModel, Field
 from datetime import datetime
+from uuid import UUID
 
 class AccountModel(SQLModel, table=True):
-    id: str = Field(primary_key=True)
+    id: UUID = Field(primary_key=True)
     balance_amount: float
     balance_currency: str
     created_at: datetime 
@@ -10,8 +11,8 @@ class AccountModel(SQLModel, table=True):
     version: int
 
 class TransactionModel(SQLModel, table=True):
-    id: str = Field(primary_key=True)
-    accountId: str = Field(foreign_key="accountmodel.id")
+    id: UUID = Field(primary_key=True)
+    accountId: UUID = Field(foreign_key="accountmodel.id")
     transactionType: str
     money_amount: float
     money_currency: str
