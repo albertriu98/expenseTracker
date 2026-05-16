@@ -24,12 +24,12 @@ async def create_account(amount: float, currency: str, handler: AccountHandler =
 @router.post("/commit_transaction")
 async def commit_transaction(accountId: str, amount: float, currency: str, description: str, category: str, transactionType: str, handler: AccountHandler = Depends(get_handler)):
     current_balance = handler.commit_transaction(CommitTransactionCommand(
-        account_id=accountId,
+        accountId=accountId,
         amount=amount,
         currency=currency,
         description=description,
         category=category,
-        transaction_type=transactionType
+        transactionType=transactionType
     ))
 
     return {"currentBalance": current_balance}
