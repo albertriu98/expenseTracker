@@ -1,3 +1,4 @@
+from __future__ import annotations
 from enum import Enum
 from decimal import Decimal
 from dataclasses import dataclass

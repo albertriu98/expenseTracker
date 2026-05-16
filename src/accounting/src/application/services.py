@@ -1,6 +1,6 @@
 from src.accounting.src.domain.entities.account import Account
 from src.accounting.src.domain.value_objects import MonetaryValue
-from src.accounting.src.api.application.commands import CreateAccountCommand, CommitTransactionCommand
+from src.accounting.src.application.commands import CreateAccountCommand, CommitTransactionCommand
 from src.accounting.src.domain.entities.transaction import Transaction
 from src.accounting.src.infrastructure.repositories.repositories import AccountRepository
 from src.accounting.src.infrastructure.event_store.event_store import EventStore

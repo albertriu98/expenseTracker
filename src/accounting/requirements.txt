@@ -1,0 +1,5 @@
+fastapi
+sqlmodel
+pika
+uvicorn[standard]
+psycopg2-binary

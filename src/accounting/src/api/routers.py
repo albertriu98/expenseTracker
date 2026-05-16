@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from typing import List
-from src.accounting.src.api.application.services import AccountHandler
-from src.accounting.src.api.application.commands import CreateAccountCommand, CommitTransactionCommand
+from src.accounting.src.application.services import AccountHandler
+from src.accounting.src.application.commands import CreateAccountCommand, CommitTransactionCommand
 from src.accounting.src.infrastructure.database.session import SessionDep
 
 

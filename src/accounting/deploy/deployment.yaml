@@ -17,11 +17,12 @@ spec:
       containers:
       - name: api
         image: albertriu1998/accounting-api:0.0.1
+        imagePullPolicy: Always
         ports:
         - containerPort: 8000
         env:
         - name: DB_HOST
-          value: "accounting-db-rw"
+          value: "accounting-db-rw.default.svc.cluster.local"
         - name: DB_PORT
           value: "5432"
         - name: DB_NAME
