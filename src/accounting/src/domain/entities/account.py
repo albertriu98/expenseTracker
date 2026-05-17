@@ -1,5 +1,6 @@
 from src.accounting.src.domain.value_objects import AccountId, MonetaryValue
 from src.accounting.src.domain.events import TransactionCommitted, AccountCreated
+from src.accounting.src.domain.domain_exceptions import InsufficientFundsException
 from datetime import datetime, timezone
 from src.base import AggregateRoot
 from decimal import Decimal
@@ -53,7 +54,10 @@ class Account(AggregateRoot):
                                                 version=self._version))
         
     def withdraw(self, money: MonetaryValue, description: str, categoryId: str):
-        self._currentBalance = self._currentBalance.subtract(money) #Replace object
+        try:
+            self._currentBalance = self._currentBalance.subtract(money) #Replace object
+        except InsufficientFundsException as e:
+            raise e
         self._dateUpdated = datetime.now(timezone.utc)
         self._version += 1
         self.add_event(TransactionCommitted(account_id=self._accountId, 

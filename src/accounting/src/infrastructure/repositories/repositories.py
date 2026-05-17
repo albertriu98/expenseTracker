@@ -25,8 +25,6 @@ class AccountRepository:
         else:
             self.session.add(model)
 
-
-    
     def delete(self, account_id: str) -> None:
         account = self.session.get(AccountModel, account_id)
         if not account:
