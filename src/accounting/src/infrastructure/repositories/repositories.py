@@ -17,7 +17,7 @@ class AccountRepository:
 
     def save(self, account: Account) -> None:
         model = AccountMapper.to_model(account)
-        sql_account =self.session.get(AccountModel, account.accountId)
+        sql_account =self.session.get(AccountModel, account.accountId.value)
         if sql_account:
             if account.version != sql_account.version + 1:
                 raise Exception("Concurrency conflict")

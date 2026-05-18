@@ -16,9 +16,10 @@ def get_handler(session: Session = Depends(get_session)):
     return AccountHandler(session)
 
 @router.post("/create_account")
-async def create_account(amount: float, currency: str, handler: AccountHandler = Depends(get_handler)):
-    account_id = handler.create_account(CreateAccountCommand(amount=amount, currency=currency))
-    return {"accountId": account_id}
+async def create_account(amount: float, currency: str, userId: str, handler: AccountHandler = Depends(get_handler)):
+    account_id = handler.create_account(CreateAccountCommand(amount=amount, currency=currency, userId=userId))
+    return {"accountId": account_id,
+            "userId": userId}
 
 
 @router.post("/commit_transaction")
