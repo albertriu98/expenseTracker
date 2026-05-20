@@ -1,3 +1,4 @@
+import json
 from sqlmodel import Session, select, update
 from src.accounting.src.infrastructure.event_store.models import Event
 from datetime import datetime
@@ -9,8 +10,8 @@ class EventStore:
     def append(self, events):
         for event in events:
             serialized = event.to_dict()
-            self.session.add(Event(event_type=serialized['eventType'], 
-                                   payload=str(serialized['payload']), 
+            self.session.add(Event(event_type=serialized['eventType'],
+                                   payload=json.dumps(serialized['payload']),
                                    published=False))
 
     def get_unpublished_events(self):

@@ -12,10 +12,10 @@ class Account(AggregateRoot):
     _dateUpdated: datetime
     _version: int
     
-    def __init__(self, accountId: AccountId, userId: str, aBalance: MonetaryValue, dateCreated: datetime, dateUpdated: datetime, version: int, events: list = []):
+    def __init__(self, accountId: AccountId, userid: str, aBalance: MonetaryValue, dateCreated: datetime, dateUpdated: datetime, version: int, events: list = []):
         super().__init__(version, events)
         self._accountId = accountId
-        self._userId = userId
+        self._userId = userid
         self._currentBalance = aBalance
         self._dateCreated = dateCreated
         self._dateUpdated = dateUpdated
@@ -28,7 +28,7 @@ class Account(AggregateRoot):
         return self._accountId
     
     @property
-    def userId(self):
+    def userid(self):
         return self._userId
     
     @property
@@ -73,7 +73,7 @@ class Account(AggregateRoot):
                                                 version=self._version))
 
     @classmethod
-    def create_account(cls, amount: Decimal, currency: str, userId: str):
+    def create_account(cls, amount: Decimal, currency: str, userid: str):
         account_id = AccountId.nextId()
         initial_balance = MonetaryValue(amount, currency)
-        return cls(account_id, userId=userId, aBalance=initial_balance, dateCreated=datetime.now(timezone.utc), dateUpdated=datetime.now(timezone.utc), version=0, events=[AccountCreated(account_id=account_id, initial_balance=initial_balance, version=0)])
+        return cls(account_id, userid=userid, aBalance=initial_balance, dateCreated=datetime.now(timezone.utc), dateUpdated=datetime.now(timezone.utc), version=0, events=[AccountCreated(account_id=account_id, initial_balance=initial_balance, version=0)])

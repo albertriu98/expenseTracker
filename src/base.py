@@ -16,12 +16,23 @@ class Event(ABC):
 
     def to_dict(self) -> dict:
         """Serialize event to dictionary."""
-        payload = {}
-        for key, value in self.__dict__.items():
+        import uuid
+        from decimal import Decimal
+
+        def serialize(value):
             if isinstance(value, datetime):
-                payload[key] = value.isoformat()
-            else:
-                payload[key] = value
+                return value.isoformat()
+            if isinstance(value, EntityId):
+                return str(value.value)
+            if hasattr(value, '_amount') and hasattr(value, '_currency'):
+                return {'amount': str(value.amount), 'currency': value.currency}
+            if isinstance(value, uuid.UUID):
+                return str(value)
+            if isinstance(value, Decimal):
+                return str(value)
+            return value
+
+        payload = {key: serialize(value) for key, value in self.__dict__.items()}
         eventType = self.__class__.typeName
         return {'eventType': eventType, 'payload': payload}
 

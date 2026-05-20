@@ -2,12 +2,12 @@ from dataclasses import dataclass
 from uuid import UUID
 
 @dataclass(frozen=True)
-class UserId:
+class userid:
     value: UUID
 
     @staticmethod
     def new():
-        return UserId(UUID())
+        return userid(UUID())
 
     @property
     def value(self):

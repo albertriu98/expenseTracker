@@ -1,11 +1,11 @@
 from src.identity.domain.value_objects.email import Email
 from src.identity.domain.value_objects.password import Password
-from src.identity.domain.value_objects.userId import UserId
+from src.identity.domain.value_objects.userid import userid
 
 class Customer:
     def __init__(self, name: str, email: Email, password: Password):
         """Do not use this constructor directly. Use the factory method `create` instead."""
-        self._id = UserId.new()
+        self._id = userid.new()
         self._name = name
         self._email = email
         self._password = password

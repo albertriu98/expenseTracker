@@ -13,13 +13,13 @@ class AccountHandler:
         self.event_store = EventStore(session)
 
     def create_account(self, aCommand: CreateAccountCommand):
-        account = Account.create_account(aCommand.amount, aCommand.currency, aCommand.userId)
+        account = Account.create_account(aCommand.amount, aCommand.currency, aCommand.userid)
         self.account_repository.save(account)
-        self.event_store.append(account.pull_events())  # Append events to the event store
+        self.event_store.append(account.pull_events())
+        self.session.commit()
         return account.accountId
-    
+
     def commit_transaction(self, aCommand: CommitTransactionCommand):
-        #Retrieve account by id
         account = self.account_repository.get_by_id(aCommand.accountId)
         if aCommand.transactionType == "income":
             account.deposit(MonetaryValue(aCommand.amount, aCommand.currency), aCommand.description, aCommand.category)
@@ -28,10 +28,10 @@ class AccountHandler:
                 account.withdraw(MonetaryValue(aCommand.amount, aCommand.currency), aCommand.description, aCommand.category)
             except InsufficientFundsException as e:
                 raise e
-        #Call event publisher to publish events in event store
         self.account_repository.save(account)
         self.event_store.append(account.pull_events())
-        return  account.getCurrentBalance
+        self.session.commit()
+        return account.getCurrentBalance
     
 
 

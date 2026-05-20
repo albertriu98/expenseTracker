@@ -3,12 +3,12 @@ from decimal import Decimal
 class CreateAccountCommand:
     amount : Decimal
     currency : str
-    userId: str
+    userid: str
 
-    def __init__(self, amount, currency, userId):
+    def __init__(self, amount, currency, userid):
         self._amount = amount
         self._currency = currency
-        self._userId = userId
+        self._userId = userid
 
     @property
     def amount(self):
@@ -19,7 +19,7 @@ class CreateAccountCommand:
         return self._currency
     
     @property
-    def userId(self):
+    def userid(self):
         return self._userId
 
 class CommitTransactionCommand:

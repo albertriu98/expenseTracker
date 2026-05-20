@@ -16,11 +16,6 @@ def create_db_and_tables():
 
 def get_session():
     with Session(engine) as session:
-        try:
-            yield session
-            session.commit()
-        except:
-            session.rollback()
-            raise
+        yield session
 
 SessionDep = Annotated[Session, Depends(get_session)]

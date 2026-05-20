@@ -8,7 +8,7 @@ class AccountMapper:
     def to_entity(model: AccountModel) -> Account:
         return Account(
             accountId=model.id,
-            userId=model.userId,
+            userid=model.userid,
             aBalance=MonetaryValue(model.balance_amount, model.balance_currency),
             dateCreated=model.created_at,
             dateUpdated=model.updated_at,
@@ -18,8 +18,8 @@ class AccountMapper:
     @staticmethod
     def to_model(entity: Account) -> AccountModel:
         return AccountModel(
-            id=entity.accountId,
-            userId=entity.userId,
+            id=entity.accountId.value,
+            userid=entity.userid,
             balance_amount=entity.getCurrentBalance,
             balance_currency=entity.getCurrency,
             created_at=entity.dateCreated,
