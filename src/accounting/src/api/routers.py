@@ -22,6 +22,8 @@ async def create_account(amount: float, currency: str, userid: str, handler: Acc
         account_id = handler.create_account(CreateAccountCommand(amount=amount, currency=currency, userid=userid))
     except SQLAlchemyError as e:
         raise HTTPException(status_code=500, detail=f"Failed to persist account: {e}")
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     return {"accountId": account_id, "userid": userid}
 
 

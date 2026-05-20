@@ -1,5 +1,5 @@
 from src.accounting.src.domain.entities.account import Account
-from src.accounting.src.domain.value_objects import MonetaryValue
+from src.accounting.src.domain.value_objects import MonetaryValue, AccountId
 from src.accounting.src.domain.entities.transaction import Transaction
 from src.accounting.src.infrastructure.repositories.models import AccountModel, TransactionModel
 
@@ -7,7 +7,7 @@ class AccountMapper:
     @staticmethod
     def to_entity(model: AccountModel) -> Account:
         return Account(
-            accountId=model.id,
+            accountId=AccountId(model.id),
             userid=model.userid,
             aBalance=MonetaryValue(model.balance_amount, model.balance_currency),
             dateCreated=model.created_at,

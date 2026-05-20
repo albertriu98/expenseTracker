@@ -13,6 +13,9 @@ class AccountHandler:
         self.event_store = EventStore(session)
 
     def create_account(self, aCommand: CreateAccountCommand):
+        account = self.account_repository.get_by_userid(aCommand.userid)
+        if account:
+            raise ValueError("Account already exists")
         account = Account.create_account(aCommand.amount, aCommand.currency, aCommand.userid)
         self.account_repository.save(account)
         self.event_store.append(account.pull_events())
