@@ -1,14 +1,10 @@
 from decimal import Decimal
 
 class CreateAccountCommand:
-    amount : Decimal
-    currency : str
-    userid: str
-
-    def __init__(self, amount, currency, userid):
-        self._amount = amount
-        self._currency = currency
-        self._userId = userid
+    def __init__(self, amount, currency, userId):
+        self._amount : Decimal = amount
+        self._currency : str = currency
+        self._userId : str = userId
 
     @property
     def amount(self):
@@ -19,24 +15,17 @@ class CreateAccountCommand:
         return self._currency
     
     @property
-    def userid(self):
+    def userId(self):
         return self._userId
 
 class CommitTransactionCommand:
-    _accountId: str
-    _amount: Decimal
-    _currency: str
-    _description: str
-    _category: str
-    _transactionType: str
-
     def __init__(self, accountId, amount, currency, description, category, transactionType):
-        self._accountId = accountId
-        self._amount = amount
-        self._currency = currency
-        self._description = description
-        self._category = category
-        self._transactionType = transactionType
+        self._accountId : str = accountId
+        self._amount : Decimal = amount
+        self._currency : str = currency
+        self._description : str = description
+        self._category : str = category
+        self._transactionType : str = transactionType
 
     @property
     def accountId(self):

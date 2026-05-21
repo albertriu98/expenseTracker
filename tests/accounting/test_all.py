@@ -4,7 +4,7 @@ from uuid import UUID
 from datetime import datetime, timezone
 
 from src.accounting.src.domain.entities.account import Account
-from src.accounting.src.domain.entities.transaction import Transaction
+from src.budgeting.domain.entities.transaction import Transaction
 from src.accounting.src.domain.domain_exceptions import InsufficientFundsException, InvalidCurrencyException
 from src.accounting.src.domain.events import AccountCreated, TransactionCommitted, TransactionCategoryUpdated, TransactionDescriptionUpdated
 from src.accounting.src.domain.value_objects import MonetaryValue, TransactionType, AccountId, TransactionId

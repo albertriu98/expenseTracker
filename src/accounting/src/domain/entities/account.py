@@ -6,29 +6,23 @@ from src.base import AggregateRoot
 from decimal import Decimal
 
 class Account(AggregateRoot):
-    _accountId: AccountId
-    _currentBalance: MonetaryValue
-    _dateCreated: datetime
-    _dateUpdated: datetime
-    _version: int
-    
-    def __init__(self, accountId: AccountId, userid: str, aBalance: MonetaryValue, dateCreated: datetime, dateUpdated: datetime, version: int, events: list = []):
+    def __init__(self, accountId: AccountId, userId: str, aBalance: MonetaryValue, dateCreated: datetime, dateUpdated: datetime, version: int, events: list = []):
         super().__init__(version, events)
-        self._accountId = accountId
-        self._userId = userid
-        self._currentBalance = aBalance
-        self._dateCreated = dateCreated
-        self._dateUpdated = dateUpdated
+        self._accountId: AccountId = accountId
+        self._userId: str = userId
+        self._currentBalance: MonetaryValue = aBalance
+        self._dateCreated: datetime = dateCreated
+        self._dateUpdated: datetime = dateUpdated
 
     def __str__(self):
-        return f"Account(id={self.accountId}, currentBalance={self.currentBalance}, currency='{self.currency}', dateCreated='{self.dateCreated}', dateUpdated='{self.dateUpdated}')"
+        return f"Account(id={self.accountId}, currentBalance={self.getCurrentBalance}, currency='{self.getCurrency}', dateCreated='{self.dateCreated}', dateUpdated='{self.dateUpdated}')"
     
     @property
     def accountId(self):
         return self._accountId
     
     @property
-    def userid(self):
+    def userId(self):
         return self._userId
     
     @property
@@ -51,12 +45,12 @@ class Account(AggregateRoot):
         self._currentBalance = self._currentBalance.add(money) #Replace object
         self._dateUpdated = datetime.now(timezone.utc)
         self._version += 1
-        self.add_event(TransactionCommitted(account_id=self._accountId, 
+        self.add_event(TransactionCommitted(account_id=self.accountId, 
                                                 money=money,
                                                 transaction_type="income", 
                                                 description=description, 
                                                 category_id=categoryId,
-                                                version=self._version))
+                                                version=self.version))
         
     def withdraw(self, money: MonetaryValue, description: str, categoryId: str):
         try:
@@ -65,12 +59,12 @@ class Account(AggregateRoot):
             raise e
         self._dateUpdated = datetime.now(timezone.utc)
         self._version += 1
-        self.add_event(TransactionCommitted(account_id=self._accountId, 
+        self.add_event(TransactionCommitted(account_id=self.accountId, 
                                                 money=money,
                                                 transaction_type="expense",  
                                                 description=description,
                                                 category_id=categoryId,
-                                                version=self._version))
+                                                version=self.version))
 
     @classmethod
     def create_account(cls, amount: Decimal, currency: str, userid: str):

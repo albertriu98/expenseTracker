@@ -13,10 +13,10 @@ class AccountHandler:
         self.event_store = EventStore(session)
 
     def create_account(self, aCommand: CreateAccountCommand):
-        account = self.account_repository.get_by_userid(aCommand.userid)
+        account = self.account_repository.get_by_userid(aCommand.userId)
         if account:
             raise ValueError("Account already exists")
-        account = Account.create_account(aCommand.amount, aCommand.currency, aCommand.userid)
+        account = Account.create_account(aCommand.amount, aCommand.currency, aCommand.userId)
         self.account_repository.save(account)
         self.event_store.append(account.pull_events())
         self.session.commit()
@@ -24,6 +24,8 @@ class AccountHandler:
 
     def commit_transaction(self, aCommand: CommitTransactionCommand):
         account = self.account_repository.get_by_id(aCommand.accountId)
+        if not account:
+            raise ValueError("Account not found")
         if aCommand.transactionType == "income":
             account.deposit(MonetaryValue(aCommand.amount, aCommand.currency), aCommand.description, aCommand.category)
         elif aCommand.transactionType == "expense":
@@ -35,6 +37,7 @@ class AccountHandler:
         self.event_store.append(account.pull_events())
         self.session.commit()
         return account.getCurrentBalance
+    
     
 
 
