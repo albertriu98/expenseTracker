@@ -70,4 +70,4 @@ class Account(AggregateRoot):
     def create_account(cls, amount: Decimal, currency: str, userid: str):
         account_id = AccountId.nextId()
         initial_balance = MonetaryValue(amount, currency)
-        return cls(account_id, userid=userid, aBalance=initial_balance, dateCreated=datetime.now(timezone.utc), dateUpdated=datetime.now(timezone.utc), version=0, events=[AccountCreated(account_id=account_id, initial_balance=initial_balance, version=0)])
+        return cls(account_id, userId=userid, aBalance=initial_balance, dateCreated=datetime.now(timezone.utc), dateUpdated=datetime.now(timezone.utc), version=0, events=[AccountCreated(account_id=account_id, initial_balance=initial_balance, version=0)])

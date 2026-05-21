@@ -15,7 +15,7 @@ class AccountRepository:
         return AccountMapper.to_entity(account)
     
     def get_by_userid(self, userid: str) -> Account:
-        statement = select(AccountModel).where(AccountModel.userid == userid)
+        statement = select(AccountModel).where(AccountModel.userId == userid)
         account = self.session.exec(statement).first()
         if not account:
             return None

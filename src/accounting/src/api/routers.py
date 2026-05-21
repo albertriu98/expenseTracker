@@ -17,14 +17,14 @@ def get_handler(session: Session = Depends(get_session)):
     return AccountHandler(session)
 
 @router.post("/create_account")
-async def create_account(amount: float, currency: str, userid: str, handler: AccountHandler = Depends(get_handler)):
+async def create_account(amount: float, currency: str, userId: str, handler: AccountHandler = Depends(get_handler)):
     try:
-        account_id = handler.create_account(CreateAccountCommand(amount=amount, currency=currency, userid=userid))
+        account_id = handler.create_account(CreateAccountCommand(amount=amount, currency=currency, userId=userId))
     except SQLAlchemyError as e:
         raise HTTPException(status_code=500, detail=f"Failed to persist account: {e}")
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
-    return {"accountId": account_id, "userid": userid}
+    return {"accountId": account_id, "userId": userId}
 
 
 @router.post("/commit_transaction")

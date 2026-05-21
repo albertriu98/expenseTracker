@@ -24,7 +24,7 @@ class Event(ABC):
                 return value.isoformat()
             if isinstance(value, EntityId):
                 return str(value.value)
-            if hasattr(value, '_amount') and hasattr(value, '_currency'):
+            if hasattr(value, 'amount') and hasattr(value, 'currency'):
                 return {'amount': str(value.amount), 'currency': value.currency}
             if isinstance(value, uuid.UUID):
                 return str(value)
