@@ -3,3 +3,5 @@ sqlmodel
 pika
 uvicorn[standard]
 psycopg2-binary
+opentelemetry-api
+opentelemetry-sdk

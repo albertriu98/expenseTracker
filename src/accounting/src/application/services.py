@@ -5,6 +5,7 @@ from src.accounting.src.infrastructure.repositories.repositories import AccountR
 from src.accounting.src.infrastructure.event_store.event_store import EventStore
 from src.accounting.src.domain.domain_exceptions import InsufficientFundsException
 from sqlmodel import Session
+from src.accounting.src.main import logger
 
 class AccountHandler:
     def __init__(self, session: Session):
@@ -16,10 +17,17 @@ class AccountHandler:
         account = self.account_repository.get_by_userid(aCommand.userId)
         if account:
             raise ValueError("Account already exists")
+        logger.info(f"Creating account for userId: {aCommand.userId} with initial amount: {aCommand.amount} {aCommand.currency}")
         account = Account.create_account(aCommand.amount, aCommand.currency, aCommand.userId)
+        logger.info(f"Account created with ID: {account.accountId}")
+        logger.info(f"Persisting account....")
         self.account_repository.save(account)
+        logger.info(f"Account persisted")
+        logger.info(f"Appending events to event store...")
         self.event_store.append(account.pull_events())
+        logger.info(f"Events appended to event store")
         self.session.commit()
+        logger.info(f"Transaction committed to database")
         return account.accountId
 
     def commit_transaction(self, aCommand: CommitTransactionCommand):
@@ -27,15 +35,23 @@ class AccountHandler:
         if not account:
             raise ValueError("Account not found")
         if aCommand.transactionType == "income":
+            logger.info(f"Committing income transaction for accountId: {aCommand.accountId} with amount: {aCommand.amount} {aCommand.currency}")
             account.deposit(MonetaryValue(aCommand.amount, aCommand.currency), aCommand.description, aCommand.category)
         elif aCommand.transactionType == "expense":
+            logger.info(f"Committing expense transaction for accountId: {aCommand.accountId} with amount: {aCommand.amount} {aCommand.currency}")
             try:
                 account.withdraw(MonetaryValue(aCommand.amount, aCommand.currency), aCommand.description, aCommand.category)
             except InsufficientFundsException as e:
                 raise e
+        logger.info(f"Transaction committed to account. Current balance: {account.getCurrentBalance} {account.getCurrency}")
+        logger.info(f"Persisting transaction....")
         self.account_repository.save(account)
+        logger.info(f"Transaction persisted")
+        logger.info(f"Appending events to event store...")
         self.event_store.append(account.pull_events())
+        logger.info(f"Events appended to event store")
         self.session.commit()
+        logger.info(f"Transaction committed to database")
         return account.getCurrentBalance
     
     

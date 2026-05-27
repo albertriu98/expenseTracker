@@ -7,6 +7,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlmodel import Session
 
 
+
 router = APIRouter(
     prefix="/accounting",
     tags=["accounting"],
