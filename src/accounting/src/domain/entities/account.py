@@ -4,6 +4,7 @@ from src.accounting.src.domain.domain_exceptions import InsufficientFundsExcepti
 from datetime import datetime, timezone
 from src.base import AggregateRoot
 from decimal import Decimal
+from src.accounting.src.core.logging import logger
 
 class Account(AggregateRoot):
     def __init__(self, accountId: AccountId, userId: str, aBalance: MonetaryValue, dateCreated: datetime, dateUpdated: datetime, version: int, events: list = []):
