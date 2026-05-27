@@ -3,7 +3,7 @@ from src.accounting.src.domain.value_objects import MonetaryValue
 from src.accounting.src.application.commands import CreateAccountCommand, CommitTransactionCommand
 from src.accounting.src.infrastructure.repositories.repositories import AccountRepository
 from src.accounting.src.infrastructure.event_store.event_store import EventStore
-from src.accounting.src.domain.domain_exceptions import InsufficientFundsException
+
 from sqlmodel import Session
 from src.accounting.src.core.logging import logger
 
@@ -34,16 +34,16 @@ class AccountCommandHandler:
         account = self.account_repository.get_by_id(aCommand.accountId)
         if not account:
             raise ValueError("Account not found")
-        if aCommand.transactionType == "income":
-            logger.info(f"Committing income transaction for accountId: {aCommand.accountId} with amount: {aCommand.amount} {aCommand.currency}")
-            account.deposit(MonetaryValue(aCommand.amount, aCommand.currency), aCommand.description, aCommand.category)
-        elif aCommand.transactionType == "expense":
-            try:
+        try:
+            if aCommand.transactionType == "income":
+                logger.info(f"Committing income transaction for accountId: {aCommand.accountId} with amount: {aCommand.amount} {aCommand.currency}")
+                account.deposit(MonetaryValue(aCommand.amount, aCommand.currency), aCommand.description, aCommand.category)
+            elif aCommand.transactionType == "expense":
                 logger.info(f"Committing expense transaction for accountId: {aCommand.accountId} with amount: {aCommand.amount} {aCommand.currency}")
                 account.withdraw(MonetaryValue(aCommand.amount, aCommand.currency), aCommand.description, aCommand.category)
-            except InsufficientFundsException as e:
-                logger.warning(f"Failed to commit transaction due to insufficient funds: {e}")
-                raise e
+        except Exception as e:
+            logger.warning(f"Failed to commit transaction: {e}")
+            raise e
         logger.info(f"Transaction committed to account. Current balance: {account.getCurrentBalance} {account.getCurrency}")
         logger.info(f"Persisting transaction....")
         self.account_repository.save(account)

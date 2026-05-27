@@ -1,6 +1,6 @@
 from src.accounting.src.domain.value_objects import AccountId, MonetaryValue
 from src.accounting.src.domain.events import TransactionCommitted, AccountCreated
-from src.accounting.src.domain.domain_exceptions import InsufficientFundsException
+from src.accounting.src.domain.domain_exceptions import InsufficientFundsException, InvalidCurrencyException
 from datetime import datetime, timezone
 from src.base import AggregateRoot
 from decimal import Decimal
@@ -43,7 +43,11 @@ class Account(AggregateRoot):
         return self._dateUpdated
 
     def deposit(self, money: MonetaryValue, description: str, categoryId: str):
-        self._currentBalance = self._currentBalance.add(money) #Replace object
+        try:
+            self._currentBalance = self._currentBalance.add(money) #Replace object
+        except InvalidCurrencyException as e:
+            logger.warning(f"Failed to deposit money: {e}")
+            raise e
         self._dateUpdated = datetime.now(timezone.utc)
         self._version += 1
         self.add_event(TransactionCommitted(account_id=self.accountId, 
@@ -57,6 +61,9 @@ class Account(AggregateRoot):
         try:
             self._currentBalance = self._currentBalance.subtract(money) #Replace object
         except InsufficientFundsException as e:
+            raise e
+        except InvalidCurrencyException as e:
+            logger.warning(f"Failed to withdraw money: {e}")
             raise e
         self._dateUpdated = datetime.now(timezone.utc)
         self._version += 1

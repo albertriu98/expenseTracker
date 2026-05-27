@@ -2,7 +2,6 @@ from fastapi import APIRouter, Depends, HTTPException
 from src.accounting.src.application.services import AccountQueryHandler, AccountCommandHandler
 from src.accounting.src.application.commands import CreateAccountCommand, CommitTransactionCommand
 from src.accounting.src.infrastructure.database.session import get_session
-from src.accounting.src.domain.domain_exceptions import InsufficientFundsException
 from sqlalchemy.exc import SQLAlchemyError
 from sqlmodel import Session
 
@@ -26,7 +25,7 @@ async def create_account(amount: float, currency: str, userId: str, handler: Acc
         account_id = handler.create_account(CreateAccountCommand(amount=amount, currency=currency, userId=userId))
     except SQLAlchemyError as e:
         raise HTTPException(status_code=500, detail=f"Failed to persist account: {e}")
-    except ValueError as e:
+    except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
     return {"accountId": account_id, "userId": userId}
 
@@ -43,7 +42,7 @@ async def commit_transaction(accountId: str, amount: float, currency: str, descr
             transactionType=transactionType
         ))
         return {"currentBalance": current_balance}
-    except InsufficientFundsException as e:
+    except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
     except SQLAlchemyError as e:
         raise HTTPException(status_code=500, detail=f"Failed to persist transaction: {e}")
@@ -53,7 +52,7 @@ async def get_balance(accountId: str, handler: AccountQueryHandler   = Depends(g
     try:
         balance_info = handler.get_balance(accountId)
         return balance_info
-    except ValueError as e:
+    except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
     except SQLAlchemyError as e:
         raise HTTPException(status_code=500, detail=f"Failed to retrieve balance: {e}")
