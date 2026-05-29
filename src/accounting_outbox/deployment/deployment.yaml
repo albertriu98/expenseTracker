@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: accounting-worker
+  labels:
+    app: accounting-worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: accounting-worker
+  template:
+    metadata:
+      labels:
+        app: accounting-worker
+    spec:
+      containers:
+      - name: api
+        image: albertriu1998/accounting-worker:0.0.1
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8000
+        env:
+        - name: DB_HOST
+          value: "accounting-db-rw.default.svc.cluster.local"
+        - name: DB_PORT
+          value: "5432"
+        - name: DB_NAME
+          value: "accounting"
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: accounting-db-credentials
+              key: username
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: accounting-db-credentials
+              key: password
